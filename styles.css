@@ -606,6 +606,10 @@ p {
   display: none;
 }
 
+.agenda-continuation-writing-lines {
+  min-height: 7rem;
+}
+
 .agenda-continuation {
   display: grid;
   gap: 0.75rem;
@@ -863,7 +867,7 @@ p {
     content: none;
   }
 
-  #preview-continuation:not(:empty) {
+  #preview-continuation {
     margin: 0;
     padding: 0;
     border: 0;

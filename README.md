@@ -36,14 +36,14 @@ Os cartões **Oradores** e **Encerramento** separam os dois primeiros oradores
 e o hino especial/apresentação coral do último orador, último hino e última
 oração.
 
-Os cartões opcionais **Ordenanças** e **Apoios e desobrigações** aparecem em
-uma nova folha quando houver conteúdo. “Ordenanças →”, “Apoios →” ou
-“Ordenanças e Apoios →” indica a continuação à direita na linha da primeira
-oração.
+Os cartões **Apoios e desobrigações** e **Ordenanças** sempre aparecem nessa
+ordem no início da segunda folha. Quando vazios, deixam espaço para
+preenchimento à mão. “Apoios e Ordenanças →” indica a continuação à direita na
+linha da primeira oração.
 
 Na impressão em papel A4, o conteúdo da agenda principal é ajustado para que
-o cartão **Encerramento** permaneça na primeira página. Ordenanças e apoios
-continuam na página seguinte quando preenchidos.
+o cartão **Encerramento** permaneça na primeira página; apoios e ordenanças
+ficam na segunda.
 
 As alterações do formulário só aparecem na agenda preenchida depois de
 selecionar **Salvar e visualizar agenda**. Os dados permanecem apenas na página

@@ -213,38 +213,56 @@ function addSacramentalBlock(container, hymnName, hymnNumber) {
 }
 
 function addContinuationBlock(container, ordinance, sustaining) {
-  if (!ordinance && !sustaining) {
-    return;
-  }
-
   const continuation = document.createElement("div");
   continuation.className = "agenda-continuation";
 
-  if (ordinance) {
-    const ordinanceCard = document.createElement("section");
-    ordinanceCard.className = "agenda-message-block agenda-continuation-card";
+  const sustainingCard = document.createElement("section");
+  sustainingCard.className = "agenda-message-block agenda-continuation-card";
 
-    const heading = document.createElement("h3");
-    heading.textContent = "Ordenanças";
-
-    const details = document.createElement("p");
-    details.textContent = ordinance;
-    ordinanceCard.append(heading, details);
-    continuation.append(ordinanceCard);
-  }
+  const sustainingHeading = document.createElement("h3");
+  sustainingHeading.textContent = "Apoios e desobrigações";
+  sustainingCard.append(sustainingHeading);
 
   if (sustaining) {
-    const sustainingCard = document.createElement("section");
-    sustainingCard.className = "agenda-message-block agenda-continuation-card";
-
-    const heading = document.createElement("h3");
-    heading.textContent = "Apoios e desobrigações";
-
     const details = document.createElement("p");
     details.textContent = sustaining;
-    sustainingCard.append(heading, details);
-    continuation.append(sustainingCard);
+    sustainingCard.append(details);
+  } else {
+    const writingLines = document.createElement("div");
+    writingLines.className = "agenda-writing-lines agenda-continuation-writing-lines";
+    writingLines.setAttribute("aria-label", "Espaço para escrever apoios e desobrigações à mão");
+
+    for (let line = 0; line < 6; line += 1) {
+      writingLines.append(document.createElement("span"));
+    }
+
+    sustainingCard.append(writingLines);
   }
+  continuation.append(sustainingCard);
+
+  const ordinanceCard = document.createElement("section");
+  ordinanceCard.className = "agenda-message-block agenda-continuation-card";
+
+  const ordinanceHeading = document.createElement("h3");
+  ordinanceHeading.textContent = "Ordenanças";
+  ordinanceCard.append(ordinanceHeading);
+
+  if (ordinance) {
+    const details = document.createElement("p");
+    details.textContent = ordinance;
+    ordinanceCard.append(details);
+  } else {
+    const writingLines = document.createElement("div");
+    writingLines.className = "agenda-writing-lines agenda-continuation-writing-lines";
+    writingLines.setAttribute("aria-label", "Espaço para escrever ordenanças à mão");
+
+    for (let line = 0; line < 6; line += 1) {
+      writingLines.append(document.createElement("span"));
+    }
+
+    ordinanceCard.append(writingLines);
+  }
+  continuation.append(ordinanceCard);
 
   container.append(continuation);
 }
@@ -297,15 +315,8 @@ function renderAgenda() {
   const openingHymnNumber = fieldValue("opening-hymn-number");
   const ordinance = fieldValue("ordinance");
   const sustaining = fieldValue("sustaining");
-  const hasContinuation = Boolean(ordinance || sustaining);
-  const continuationItems = [
-    ordinance ? "Ordenanças" : "",
-    sustaining ? "Apoios" : ""
-  ].filter(Boolean);
-  const continuationLabel = hasContinuation
-    ? `${continuationItems.join(" e ")} →`
-    : "";
-  previewContent.classList.toggle("agenda-has-continuation", hasContinuation);
+  const continuationLabel = "Apoios e Ordenanças →";
+  previewContent.classList.add("agenda-has-continuation");
   addOpeningBlock(
     previewContent,
     openingHymnName,
