@@ -593,19 +593,6 @@ p {
   line-height: 1.55;
 }
 
-.agenda-page-turn {
-  display: block;
-  color: var(--green);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-align: right;
-  white-space: nowrap;
-}
-
-#preview-content:not(.agenda-has-continuation) .agenda-page-turn {
-  display: none;
-}
-
 .agenda-continuation-writing-lines {
   min-height: 7rem;
 }
@@ -831,26 +818,8 @@ p {
     padding-top: 1rem;
   }
 
-  .agenda-assignments-block .agenda-entry-row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.45rem;
-  }
-
-  .agenda-assignments-block .agenda-assignment-leaderships > .agenda-entry + .agenda-entry {
-    margin-top: 0;
-  }
-
-  .agenda-assignments-block .agenda-assignment-leaderships > .agenda-entry:last-child {
-    justify-content: flex-start;
-    text-align: left;
-  }
-
   .agenda-opening-block .agenda-prayer-row {
     grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .agenda-opening-block .agenda-page-turn {
-    grid-column: 1 / -1;
   }
 
   .preview-heading {

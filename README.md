@@ -12,7 +12,9 @@ Dados fictícios são carregados para demonstração; edite os campos e selecion
 **Ala** é manual por enquanto e aparece nas boas-vindas junto à data.
 Na prévia, cada folha aparece separada e a quebra de página indica onde começa
 a segunda página. Em telas pequenas, cartões e campos se reorganizam para
-leitura e preenchimento no celular, sem alterar a paginação A4 da impressão.
+leitura e preenchimento no celular, mantendo a mesma disposição de
+presidência, direção e designações da versão para computador, sem alterar a
+paginação A4 da impressão.
 
 No cartão **Designações**, presidente e dirigente aparecem lado a lado na
 primeira linha; regente, organista e recepcionista ficam juntos na linha
@@ -39,8 +41,7 @@ oração.
 
 Os cartões **Apoios e desobrigações** e **Ordenanças** sempre aparecem nessa
 ordem no início da segunda folha. Quando vazios, deixam espaço para
-preenchimento à mão. “Apoios e Ordenanças →” indica a continuação à direita na
-linha da primeira oração.
+preenchimento à mão.
 
 Na impressão em papel A4, o conteúdo da agenda principal é ajustado para que
 o cartão **Encerramento** permaneça na primeira página; apoios e ordenanças

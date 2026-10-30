@@ -170,7 +170,7 @@ function createHymnRow(label, hymnName, hymnNumber) {
   return hymnRow;
 }
 
-function addOpeningBlock(container, hymnName, hymnNumber, prayer, continuationLabel) {
+function addOpeningBlock(container, hymnName, hymnNumber, prayer) {
   const block = document.createElement("section");
   block.className = "agenda-message-block agenda-opening-block";
 
@@ -188,11 +188,6 @@ function addOpeningBlock(container, hymnName, hymnNumber, prayer, continuationLa
   prayerValue.className = "agenda-entry-value";
   prayerValue.textContent = prayer || "A definir";
   prayerRow.append(prayerLabel, prayerValue);
-
-  const pageTurn = document.createElement("span");
-  pageTurn.className = "agenda-page-turn";
-  pageTurn.textContent = continuationLabel;
-  prayerRow.append(pageTurn);
 
   block.append(prayerRow);
   container.append(block);
@@ -315,14 +310,11 @@ function renderAgenda() {
   const openingHymnNumber = fieldValue("opening-hymn-number");
   const ordinance = fieldValue("ordinance");
   const sustaining = fieldValue("sustaining");
-  const continuationLabel = "Apoios e Ordenanças →";
-  previewContent.classList.add("agenda-has-continuation");
   addOpeningBlock(
     previewContent,
     openingHymnName,
     openingHymnNumber,
-    fieldValue("opening-prayer"),
-    continuationLabel
+    fieldValue("opening-prayer")
   );
   addSacramentalBlock(
     previewContent,
