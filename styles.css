@@ -775,17 +775,108 @@ p {
     padding: 0 5%;
   }
 
+  .brand {
+    gap: 0.45rem;
+    font-size: 0.9rem;
+  }
+
   .header-caption {
     font-size: 0.7rem;
   }
 
   main {
-    width: 92%;
-    padding-top: 2.2rem;
+    width: 94%;
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .screen-header {
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .page-intro h1 {
+    font-size: clamp(2rem, 8vw, 2.5rem);
+  }
+
+  .intro-copy {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .screen-header > .button,
+  .form-actions .button {
+    width: 100%;
+  }
+
+  .agenda-form,
+  .preview-panel {
+    border-radius: 0.75rem;
+  }
+
+  .agenda-form,
+  .preview-panel {
+    padding: 1rem;
+  }
+
+  .agenda-first-page,
+  #preview-continuation > .agenda-continuation {
+    width: 100%;
+    min-height: 0;
+    padding: 1rem;
+    box-shadow: 0 4px 14px rgb(32 51 47 / 6%);
+  }
+
+  #preview-continuation:not(:empty) {
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+
+  .agenda-assignments-block .agenda-entry-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.45rem;
+  }
+
+  .agenda-assignments-block .agenda-assignment-leaderships > .agenda-entry + .agenda-entry {
+    margin-top: 0;
+  }
+
+  .agenda-assignments-block .agenda-assignment-leaderships > .agenda-entry:last-child {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .agenda-opening-block .agenda-prayer-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .agenda-opening-block .agenda-page-turn {
+    grid-column: 1 / -1;
+  }
+
+  .preview-heading {
+    padding-bottom: 0.75rem;
+  }
+
+  .agenda-writing-lines {
+    min-height: 3.5rem;
   }
 
   .field-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .assignment-fields {
+    margin-top: 0.75rem;
+  }
+
+  .form-section + .form-section {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+  }
+
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .site-footer {
@@ -796,6 +887,12 @@ p {
   .screen-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 360px) {
+  .header-caption {
+    display: none;
   }
 }
 

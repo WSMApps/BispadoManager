@@ -11,7 +11,8 @@ Dados fictícios são carregados para demonstração; edite os campos e selecion
 **Salvar e visualizar agenda** para atualizar a agenda preenchida. O campo
 **Ala** é manual por enquanto e aparece nas boas-vindas junto à data.
 Na prévia, cada folha aparece separada e a quebra de página indica onde começa
-a segunda página.
+a segunda página. Em telas pequenas, cartões e campos se reorganizam para
+leitura e preenchimento no celular, sem alterar a paginação A4 da impressão.
 
 No cartão **Designações**, presidente e dirigente aparecem lado a lado na
 primeira linha; regente, organista e recepcionista ficam juntos na linha
