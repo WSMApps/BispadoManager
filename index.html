@@ -3,17 +3,242 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Aplicação BispadoManager.">
-  <title>BispadoManager</title>
+  <meta name="description" content="Monte e imprima a agenda da reunião sacramental.">
+  <title>Agenda sacramental | BispadoManager</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="supabase-config.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="BispadoManager, início">
+      <span class="brand-mark" aria-hidden="true">B</span>
+      <span>Bispado<span class="brand-light">Manager</span></span>
+    </a>
+    <span class="header-caption">Organização da reunião</span>
+  </header>
+
   <main>
-    <h1>BispadoManager</h1>
-    <p id="app-status" role="status">Inicializando aplicação...</p>
+    <p id="app-status" class="app-status" role="status" aria-live="polite">Inicializando aplicação...</p>
+
+    <section id="create-screen" class="app-screen" aria-labelledby="create-page-title" hidden>
+      <header class="screen-header">
+        <div class="page-intro">
+          <p class="eyebrow">REUNIÃO SACRAMENTAL</p>
+          <h1 id="create-page-title" tabindex="-1">Criar agenda</h1>
+          <p class="intro-copy">Preencha as designações e os detalhes da reunião sacramental.</p>
+        </div>
+        <button id="cancel-agenda-button" class="button button-secondary" type="button">Voltar para agenda</button>
+      </header>
+
+      <form id="agenda-form" class="agenda-form">
+        <p id="demo-notice" class="demo-notice" role="status">Exemplo de demonstração carregado. Substitua os dados pelos detalhes da sua reunião.</p>
+        <section class="form-section" aria-labelledby="details-title">
+          <div class="section-heading">
+            <span class="section-number">01</span>
+            <div>
+              <h2 id="details-title">Presidência e designações</h2>
+              <p>Informe quem preside e dirige a reunião e as designações.</p>
+            </div>
+          </div>
+          <div class="field-grid presidency-fields">
+            <div class="field">
+              <label for="ward">Ala</label>
+              <input id="ward" name="ward" type="text" placeholder="Nome da ala">
+            </div>
+            <div class="field">
+              <label for="president">Presidente</label>
+              <input id="president" name="president" type="text" autocomplete="name" placeholder="Nome do presidente">
+            </div>
+            <div class="field">
+              <label for="meeting-date">Data</label>
+              <input id="meeting-date" name="meeting-date" type="date">
+            </div>
+            <div class="field conducting-field">
+              <label for="conducting">Dirigida por</label>
+              <input id="conducting" name="conducting" type="text" autocomplete="name" placeholder="Nome do irmão que dirige">
+            </div>
+          </div>
+          <div class="field-grid assignment-fields">
+            <div class="field">
+              <label for="regent">Regente</label>
+              <input id="regent" name="regent" type="text" autocomplete="name" placeholder="Nome do regente">
+            </div>
+            <div class="field">
+              <label for="organist">Organista</label>
+              <input id="organist" name="organist" type="text" autocomplete="name" placeholder="Nome do organista">
+            </div>
+            <div class="field">
+              <label for="receptionist">Recepcionista</label>
+              <input id="receptionist" name="receptionist" type="text" autocomplete="name" placeholder="Nome do recepcionista">
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="program-title">
+          <div class="section-heading">
+            <span class="section-number">02</span>
+            <div>
+              <h2 id="program-title">Abertura e programa</h2>
+              <p>Adicione as boas-vindas, os anúncios, hinos e orações.</p>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field field-wide">
+              <label for="welcome">Boas-vindas</label>
+              <textarea id="welcome" name="welcome" rows="2" placeholder="Ex.: Sejam todos bem-vindos à reunião sacramental."></textarea>
+            </div>
+            <div class="field field-wide">
+              <label for="leaders-present">Reconhecimento</label>
+              <textarea id="leaders-present" name="leaders-present" rows="2" placeholder="Nome da liderança presente"></textarea>
+            </div>
+            <div class="field field-wide">
+              <label for="announcements">Anúncios</label>
+              <textarea id="announcements" name="announcements" rows="2" placeholder="Anúncios da reunião"></textarea>
+            </div>
+            <div class="field">
+              <label for="opening-hymn-name">Primeiro hino</label>
+              <input id="opening-hymn-name" name="opening-hymn-name" type="text" placeholder="Nome do hino">
+            </div>
+            <div class="field">
+              <label for="opening-hymn-number">Número</label>
+              <input id="opening-hymn-number" name="opening-hymn-number" type="text" inputmode="numeric" placeholder="Número do hino">
+            </div>
+            <div class="field">
+              <label for="opening-prayer">Primeira oração</label>
+              <input id="opening-prayer" name="opening-prayer" type="text" autocomplete="name" placeholder="Nome de quem fará a oração">
+            </div>
+            <div class="field field-wide">
+              <label for="ordinance">Ordenança (opcional)</label>
+              <textarea id="ordinance" name="ordinance" rows="2" placeholder="Preencha se houver uma ordenança"></textarea>
+            </div>
+            <div class="field field-wide">
+              <label for="sustaining">Apoios e desobrigações (opcional)</label>
+              <textarea id="sustaining" name="sustaining" rows="3" placeholder="Nomes e chamados para apoio ou desobrigação"></textarea>
+            </div>
+            <div class="field">
+              <label for="sacramental-hymn">Hino sacramental</label>
+              <input id="sacramental-hymn" name="sacramental-hymn" type="text" placeholder="Nome do hino">
+            </div>
+            <div class="field">
+              <label for="sacramental-hymn-number">Número</label>
+              <input id="sacramental-hymn-number" name="sacramental-hymn-number" type="text" inputmode="numeric" placeholder="Número do hino sacramental">
+            </div>
+            <div class="field">
+              <label for="special-hymn">Hino especial / Apresentação Coral</label>
+              <input id="special-hymn" name="special-hymn" type="text" placeholder="Nome ou número do hino">
+            </div>
+            <div class="field">
+              <label for="closing-hymn">Último hino</label>
+              <input id="closing-hymn" name="closing-hymn" type="text" placeholder="Nome ou número do hino">
+            </div>
+            <div class="field">
+              <label for="closing-prayer">Última oração</label>
+              <input id="closing-prayer" name="closing-prayer" type="text" autocomplete="name" placeholder="Nome de quem fará a oração">
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="speakers-title">
+          <div class="section-heading">
+            <span class="section-number">03</span>
+            <div>
+              <h2 id="speakers-title">Oradores</h2>
+              <p>Adicione o nome e o tema de cada orador.</p>
+            </div>
+          </div>
+          <div class="speaker-fields">
+            <fieldset class="speaker-card">
+              <legend>Primeiro orador</legend>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="speaker-1-name">Nome</label>
+                  <input id="speaker-1-name" name="speaker-1-name" type="text" autocomplete="name" placeholder="Nome do primeiro orador">
+                </div>
+                <div class="field">
+                  <label for="speaker-1-topic">Tema</label>
+                  <input id="speaker-1-topic" name="speaker-1-topic" type="text" placeholder="Tema da mensagem">
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="speaker-card">
+              <legend>Segundo orador</legend>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="speaker-2-name">Nome</label>
+                  <input id="speaker-2-name" name="speaker-2-name" type="text" autocomplete="name" placeholder="Nome do segundo orador">
+                </div>
+                <div class="field">
+                  <label for="speaker-2-topic">Tema</label>
+                  <input id="speaker-2-topic" name="speaker-2-topic" type="text" placeholder="Tema da mensagem">
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="speaker-card">
+              <legend>Último orador</legend>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="speaker-3-name">Nome</label>
+                  <input id="speaker-3-name" name="speaker-3-name" type="text" autocomplete="name" placeholder="Nome do último orador">
+                </div>
+                <div class="field">
+                  <label for="speaker-3-topic">Tema</label>
+                  <input id="speaker-3-topic" name="speaker-3-topic" type="text" placeholder="Tema da mensagem">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <button class="button button-primary" type="submit">Salvar e visualizar agenda <span aria-hidden="true">→</span></button>
+          <button class="button button-secondary" type="reset">Limpar campos</button>
+        </div>
+      </form>
+
+    </section>
+
+    <section id="agenda-screen" class="app-screen" aria-labelledby="agenda-page-title">
+      <header class="screen-header">
+        <div class="page-intro">
+          <p class="eyebrow">REUNIÃO SACRAMENTAL</p>
+          <h1 id="agenda-page-title" tabindex="-1">Agenda preenchida</h1>
+          <p class="intro-copy">Confira a agenda da reunião ou imprima uma cópia.</p>
+        </div>
+        <button id="create-agenda-button" class="button button-primary" type="button">Criar agenda</button>
+      </header>
+
+      <aside class="preview-panel" aria-labelledby="preview-title">
+        <div class="preview-heading">
+          <div>
+            <p class="eyebrow">AGENDA PRONTA</p>
+            <h2 id="preview-title">Sua agenda</h2>
+          </div>
+          <span class="preview-icon" aria-hidden="true">✦</span>
+        </div>
+        <div id="agenda-placeholder" class="preview-placeholder">
+          <span class="placeholder-icon" aria-hidden="true">☷</span>
+          <p>Os detalhes da reunião aparecerão aqui quando você gerar a agenda.</p>
+        </div>
+        <article id="agenda-preview" class="agenda-preview" aria-label="Agenda sacramental gerada" hidden>
+          <div id="agenda-first-page" class="agenda-first-page">
+            <header class="print-heading">
+              <h2>Reunião sacramental</h2>
+            </header>
+            <div id="preview-content"></div>
+          </div>
+          <div id="preview-continuation"></div>
+          <button id="print-agenda" class="button button-print" type="button">Imprimir agenda</button>
+        </article>
+        <p class="privacy-note"><span aria-hidden="true">◇</span> As informações ficam nesta página e não são salvas.</p>
+      </aside>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <span>BispadoManager</span>
+    <span>Uma reunião organizada começa com uma boa preparação.</span>
+  </footer>
 </body>
 </html>
