@@ -772,13 +772,15 @@ p {
   }
 
   main {
-    width: 94%;
-    padding: 1.5rem 0 2.5rem;
+    width: 100%;
+    padding: 1rem 0 2rem;
   }
 
   .screen-header {
+    margin-right: 1rem;
+    margin-left: 1rem;
     gap: 1rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
   }
 
   .page-intro h1 {
@@ -795,27 +797,37 @@ p {
     width: 100%;
   }
 
-  .agenda-form,
-  .preview-panel {
+  .agenda-form {
     border-radius: 0.75rem;
+    padding: 1rem;
   }
 
-  .agenda-form,
   .preview-panel {
-    padding: 1rem;
+    padding: 0 0.5rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .agenda-first-page,
   #preview-continuation > .agenda-continuation {
     width: 100%;
     min-height: 0;
-    padding: 1rem;
-    box-shadow: 0 4px 14px rgb(32 51 47 / 6%);
+    padding: 0.25rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   #preview-continuation:not(:empty) {
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+  }
+
+  .agenda-message-block {
+    margin-bottom: 0.5rem;
+    padding: 0.65rem;
   }
 
   .agenda-opening-block .agenda-prayer-row {
@@ -823,7 +835,8 @@ p {
   }
 
   .preview-heading {
-    padding-bottom: 0.75rem;
+    margin: 0 0.5rem;
+    padding-bottom: 0.65rem;
   }
 
   .agenda-writing-lines {
