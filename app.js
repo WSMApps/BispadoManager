@@ -98,7 +98,11 @@ function addDetailsCard(container, title, entries) {
   card.append(heading);
 
   for (const entry of entries) {
-    addEntry(card, entry.label, entry.value);
+    if (entry.hymnNumber !== undefined) {
+      card.append(createHymnRow(entry.label, entry.value, entry.hymnNumber));
+    } else {
+      addEntry(card, entry.label, entry.value);
+    }
   }
 
   container.append(card);
@@ -120,6 +124,31 @@ function addMessageBlock(container, title, message, blockClass = "") {
     paragraph.textContent = message;
     block.append(paragraph);
   }
+  container.append(block);
+}
+
+function addWelcomeBlock(container, ward, date, visitors) {
+  const block = document.createElement("section");
+  block.className = "agenda-message-block";
+
+  const heading = document.createElement("h3");
+  heading.textContent = "Boas-vindas";
+
+  const greeting = document.createElement("p");
+  const details = [
+    ward ? `da Ala ${ward}` : "",
+    date ? `em ${date}` : ""
+  ].filter(Boolean);
+  greeting.textContent = `Sejam todos bem-vindos à reunião sacramental${details.length ? ` ${details.join(", ")}` : ""}.`;
+  block.append(heading, greeting);
+
+  if (visitors) {
+    const recognition = document.createElement("p");
+    recognition.className = "agenda-welcome-recognition";
+    recognition.textContent = `Reconhecemos e damos as boas-vindas nesta manhã a todos que nos visitam. Em especial ${visitors}.`;
+    block.append(recognition);
+  }
+
   container.append(block);
 }
 
@@ -273,15 +302,11 @@ function renderAgenda() {
       year: "numeric"
     })
     : "";
-  const welcome = fieldValue("welcome") || "Sejam todos bem-vindos à reunião sacramental";
-  const welcomeDetails = [
-    fieldValue("ward") ? `da Ala ${fieldValue("ward")}` : "",
-    formattedDate ? `em ${formattedDate}` : ""
-  ].filter(Boolean);
-  addMessageBlock(
+  addWelcomeBlock(
     previewContent,
-    "Boas-vindas",
-    `${welcome.replace(/[.!?]+$/, "")}${welcomeDetails.length ? ` ${welcomeDetails.join(", ")}` : ""}.`
+    fieldValue("ward"),
+    formattedDate,
+    fieldValue("leaders-present")
   );
   const assignments = document.createElement("section");
   assignments.className = "agenda-message-block agenda-assignments-block";
@@ -298,13 +323,6 @@ function renderAgenda() {
     { label: "Recepcionista", value: fieldValue("receptionist") }
   ]);
   previewContent.append(assignments);
-  const visitors = fieldValue("leaders-present");
-  addMessageBlock(
-    previewContent,
-    "Reconhecemos e damos as boas-vindas nesta manhã a todos que nos visitam.",
-    visitors ? `Em especial ${visitors}.` : "",
-    "agenda-recognition-block"
-  );
   addAnnouncementsBlock(previewContent, fieldValue("announcements"));
   const openingHymnName = fieldValue("opening-hymn-name");
   const openingHymnNumber = fieldValue("opening-hymn-number");
@@ -333,8 +351,9 @@ function renderAgenda() {
       theme: fieldValue("speaker-2-topic")
     },
     {
-      label: "Hino especial / Apresentação Coral",
-      value: fieldValue("special-hymn")
+      label: "Hino especial",
+      value: fieldValue("special-hymn"),
+      hymnNumber: fieldValue("special-hymn-number")
     }
   ]);
   addDetailsCard(previewContent, "Encerramento", [
@@ -343,7 +362,11 @@ function renderAgenda() {
       value: fieldValue("speaker-3-name"),
       theme: fieldValue("speaker-3-topic")
     },
-    { label: "Último hino", value: fieldValue("closing-hymn") },
+    {
+      label: "Último hino",
+      value: fieldValue("closing-hymn"),
+      hymnNumber: fieldValue("closing-hymn-number")
+    },
     { label: "Última oração", value: fieldValue("closing-prayer") }
   ]);
   addContinuationBlock(previewContinuation, ordinance, sustaining);
@@ -360,7 +383,6 @@ const exampleValues = {
   receptionist: "Geraldo Donizetti da Silva",
   "meeting-date": "2026-12-30",
   ward: "Guararema",
-  welcome: "Sejam todos bem-vindos à reunião sacramental.",
   "leaders-present": "Presidente Exemplo e líderes convidados",
   announcements: "Mutirão da capela no sábado, às 9h.\nAtividade da ala na próxima sexta-feira.",
   "opening-hymn-name": "Vinde, Ó Santos",

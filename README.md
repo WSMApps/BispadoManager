@@ -14,29 +14,37 @@ Na prévia, cada folha aparece separada e a quebra de página indica onde começ
 a segunda página. Em telas pequenas, cartões e campos se reorganizam para
 leitura e preenchimento no celular, mantendo a mesma disposição de
 presidência, direção e designações da versão para computador, sem alterar a
-paginação A4 da impressão.
+paginação A4 da impressão. No formulário, a data fica compacta ao lado do campo
+**Ala**.
+
+O texto de boas-vindas é fixo e inclui a ala e a data quando informadas. O
+reconhecimento dos visitantes complementa esse texto somente quando preenchido.
 
 No cartão **Designações**, presidente e dirigente aparecem lado a lado na
 primeira linha; regente, organista e recepcionista ficam juntos na linha
-seguinte. O formulário também inclui boas-vindas, anúncios, hinos, orações,
+seguinte. O formulário também inclui reconhecimento, anúncios, hinos, orações,
 apoios e desobrigações e os demais itens da reunião.
+Na tela de cadastro, a seção **Abertura e cronograma** reúne reconhecimentos,
+anúncios, hinos, orações, apoios e ordenanças. Os quatro hinos ficam agrupados
+em um cartão, as duas orações em outro, e os campos dos três oradores ficam
+reunidos em um grupo.
 
 O cartão **Anúncios** permanece na agenda mesmo sem texto e deixa três linhas
 em branco para preenchimento à mão após a impressão.
 
-O bloco **Designações** usa o mesmo estilo visual dos blocos de boas-vindas e
-reconhecimento. Os nomes do presidente e de quem dirige aparecem abaixo dos
-rótulos.
+O bloco **Designações** usa o mesmo estilo visual do bloco de boas-vindas. Os
+nomes do presidente e de quem dirige aparecem abaixo dos rótulos.
 
 O cartão **Abertura** mostra o primeiro hino com seu número na mesma linha e a
 primeira oração logo abaixo. Um campo opcional permite acrescentar uma
 ordenança após a oração.
 
-O cartão **Sacramento** mostra o hino sacramental com o número alinhado à
-direita e a mensagem sobre a bênção e distribuição do sacramento.
+Os hinos de abertura, sacramental, especial/coral e de encerramento têm campo
+próprio para o número, posicionado à direita do nome no formulário. Na agenda,
+o número aparece em destaque pequeno à direita do nome.
 
 Os cartões **Oradores** e **Encerramento** separam os dois primeiros oradores
-e o hino especial/apresentação coral do último orador, último hino e última
+e o hino especial do último orador, último hino e última
 oração.
 
 Os cartões **Apoios e desobrigações** e **Ordenanças** sempre aparecem nessa

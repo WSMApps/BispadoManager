@@ -43,15 +43,15 @@
             </div>
           </div>
           <div class="field-grid presidency-fields">
-            <div class="field">
+            <div class="field ward-field">
               <label for="ward">Ala</label>
               <input id="ward" name="ward" type="text" placeholder="Nome da ala">
             </div>
-            <div class="field">
+            <div class="field president-field">
               <label for="president">Presidente</label>
               <input id="president" name="president" type="text" autocomplete="name" placeholder="Nome do presidente">
             </div>
-            <div class="field">
+            <div class="field date-field">
               <label for="meeting-date">Data</label>
               <input id="meeting-date" name="meeting-date" type="date">
             </div>
@@ -80,62 +80,84 @@
           <div class="section-heading">
             <span class="section-number">02</span>
             <div>
-              <h2 id="program-title">Abertura e programa</h2>
-              <p>Adicione as boas-vindas, os anúncios, hinos e orações.</p>
+              <h2 id="program-title">Abertura e cronograma</h2>
+              <p>Organize reconhecimentos, anúncios, hinos, orações, apoios e ordenanças.</p>
             </div>
           </div>
           <div class="field-grid">
             <div class="field field-wide">
-              <label for="welcome">Boas-vindas</label>
-              <textarea id="welcome" name="welcome" rows="2" placeholder="Ex.: Sejam todos bem-vindos à reunião sacramental."></textarea>
-            </div>
-            <div class="field field-wide">
-              <label for="leaders-present">Reconhecimento</label>
-              <textarea id="leaders-present" name="leaders-present" rows="2" placeholder="Nome da liderança presente"></textarea>
+              <label for="leaders-present">Visitantes para reconhecimento (opcional)</label>
+              <textarea id="leaders-present" name="leaders-present" rows="2" placeholder="Nomes dos visitantes ou líderes presentes"></textarea>
             </div>
             <div class="field field-wide">
               <label for="announcements">Anúncios</label>
               <textarea id="announcements" name="announcements" rows="2" placeholder="Anúncios da reunião"></textarea>
             </div>
-            <div class="field">
-              <label for="opening-hymn-name">Primeiro hino</label>
-              <input id="opening-hymn-name" name="opening-hymn-name" type="text" placeholder="Nome do hino">
-            </div>
-            <div class="field">
-              <label for="opening-hymn-number">Número</label>
-              <input id="opening-hymn-number" name="opening-hymn-number" type="text" inputmode="numeric" placeholder="Número do hino">
-            </div>
-            <div class="field">
-              <label for="opening-prayer">Primeira oração</label>
-              <input id="opening-prayer" name="opening-prayer" type="text" autocomplete="name" placeholder="Nome de quem fará a oração">
-            </div>
-            <div class="field field-wide">
-              <label for="ordinance">Ordenança (opcional)</label>
-              <textarea id="ordinance" name="ordinance" rows="2" placeholder="Preencha se houver uma ordenança"></textarea>
-            </div>
+            <fieldset class="field-wide hymn-group">
+              <legend>Hinos</legend>
+              <div class="hymn-list">
+                <div class="field-grid hymn-fields">
+                  <div class="field">
+                    <label for="opening-hymn-name">Primeiro hino</label>
+                    <input id="opening-hymn-name" name="opening-hymn-name" type="text" placeholder="Nome do hino">
+                  </div>
+                  <div class="field hymn-number-field">
+                    <label for="opening-hymn-number">Número</label>
+                    <input id="opening-hymn-number" name="opening-hymn-number" type="text" inputmode="numeric" placeholder="Número">
+                  </div>
+                </div>
+                <div class="field-grid hymn-fields">
+                  <div class="field">
+                    <label for="sacramental-hymn">Hino sacramental</label>
+                    <input id="sacramental-hymn" name="sacramental-hymn" type="text" placeholder="Nome do hino">
+                  </div>
+                  <div class="field hymn-number-field">
+                    <label for="sacramental-hymn-number">Número</label>
+                    <input id="sacramental-hymn-number" name="sacramental-hymn-number" type="text" inputmode="numeric" placeholder="Número">
+                  </div>
+                </div>
+                <div class="field-grid hymn-fields">
+                  <div class="field">
+                    <label for="special-hymn">Hino especial</label>
+                    <input id="special-hymn" name="special-hymn" type="text" placeholder="Nome do hino">
+                  </div>
+                  <div class="field hymn-number-field">
+                    <label for="special-hymn-number">Número</label>
+                    <input id="special-hymn-number" name="special-hymn-number" type="text" inputmode="numeric" placeholder="Número">
+                  </div>
+                </div>
+                <div class="field-grid hymn-fields">
+                  <div class="field">
+                    <label for="closing-hymn">Último hino</label>
+                    <input id="closing-hymn" name="closing-hymn" type="text" placeholder="Nome do hino">
+                  </div>
+                  <div class="field hymn-number-field">
+                    <label for="closing-hymn-number">Número</label>
+                    <input id="closing-hymn-number" name="closing-hymn-number" type="text" inputmode="numeric" placeholder="Número">
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="field-wide prayer-group">
+              <legend>Orações</legend>
+              <div class="field-grid prayer-fields">
+                <div class="field">
+                  <label for="opening-prayer">Primeira oração</label>
+                  <input id="opening-prayer" name="opening-prayer" type="text" autocomplete="name" placeholder="Nome de quem fará a oração">
+                </div>
+                <div class="field">
+                  <label for="closing-prayer">Última oração</label>
+                  <input id="closing-prayer" name="closing-prayer" type="text" autocomplete="name" placeholder="Nome de quem fará a oração">
+                </div>
+              </div>
+            </fieldset>
             <div class="field field-wide">
               <label for="sustaining">Apoios e desobrigações (opcional)</label>
               <textarea id="sustaining" name="sustaining" rows="3" placeholder="Nomes e chamados para apoio ou desobrigação"></textarea>
             </div>
-            <div class="field">
-              <label for="sacramental-hymn">Hino sacramental</label>
-              <input id="sacramental-hymn" name="sacramental-hymn" type="text" placeholder="Nome do hino">
-            </div>
-            <div class="field">
-              <label for="sacramental-hymn-number">Número</label>
-              <input id="sacramental-hymn-number" name="sacramental-hymn-number" type="text" inputmode="numeric" placeholder="Número do hino sacramental">
-            </div>
-            <div class="field">
-              <label for="special-hymn">Hino especial / Apresentação Coral</label>
-              <input id="special-hymn" name="special-hymn" type="text" placeholder="Nome ou número do hino">
-            </div>
-            <div class="field">
-              <label for="closing-hymn">Último hino</label>
-              <input id="closing-hymn" name="closing-hymn" type="text" placeholder="Nome ou número do hino">
-            </div>
-            <div class="field">
-              <label for="closing-prayer">Última oração</label>
-              <input id="closing-prayer" name="closing-prayer" type="text" autocomplete="name" placeholder="Nome de quem fará a oração">
+            <div class="field field-wide">
+              <label for="ordinance">Ordenanças (opcional)</label>
+              <textarea id="ordinance" name="ordinance" rows="2" placeholder="Preencha se houver uma ordenança"></textarea>
             </div>
           </div>
         </section>
@@ -148,7 +170,7 @@
               <p>Adicione o nome e o tema de cada orador.</p>
             </div>
           </div>
-          <div class="speaker-fields">
+          <div class="speaker-fields speaker-group">
             <fieldset class="speaker-card">
               <legend>Primeiro orador</legend>
               <div class="field-grid">
