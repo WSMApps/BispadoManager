@@ -6,21 +6,52 @@
   <meta name="description" content="Monte e imprima a agenda da reunião sacramental.">
   <title>Agenda sacramental | BispadoManager</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="chat.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="supabase-config.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="knowledge-base.js" defer></script>
+  <script src="manual-index.js" defer></script>
+  <script src="hymn-catalog.js" defer></script>
+  <script src="chatbot.js" defer></script>
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="#" aria-label="BispadoManager, início">
+    <a class="brand" href="#inicio" data-screen="home" aria-label="BispadoManager, início">
       <span class="brand-mark" aria-hidden="true">B</span>
       <span>Bispado<span class="brand-light">Manager</span></span>
     </a>
+    <nav class="primary-nav" aria-label="Menu principal">
+      <a href="#inicio" data-screen="home" aria-current="page">Início</a>
+      <a href="#agenda" data-screen="agenda">Agenda Sacramental</a>
+    </nav>
     <span class="header-caption">Organização da reunião</span>
   </header>
 
   <main>
     <p id="app-status" class="app-status" role="status" aria-live="polite">Inicializando aplicação...</p>
+
+    <section id="home-screen" class="app-screen" aria-labelledby="home-page-title">
+      <header class="screen-header">
+        <div class="page-intro">
+          <p class="eyebrow">BISPADO MANAGER</p>
+          <h1 id="home-page-title" tabindex="-1">Página inicial</h1>
+          <p class="intro-copy">Acesse as ferramentas para organizar a ala.</p>
+        </div>
+        <button id="open-agenda-button" class="button button-primary" type="button">Abrir Agenda Sacramental <span aria-hidden="true">→</span></button>
+      </header>
+
+      <section class="home-dashboard" aria-labelledby="indicators-title">
+        <div class="dashboard-heading">
+          <p class="eyebrow">VISÃO GERAL</p>
+          <h2 id="indicators-title">Indicadores</h2>
+        </div>
+        <div class="indicator-placeholder" role="note">
+          <span class="placeholder-icon" aria-hidden="true">◌</span>
+          <p>Os indicadores serão exibidos aqui futuramente.</p>
+        </div>
+      </section>
+    </section>
 
     <section id="create-screen" class="app-screen" aria-labelledby="create-page-title" hidden>
       <header class="screen-header">
@@ -81,7 +112,7 @@
             <span class="section-number">02</span>
             <div>
               <h2 id="program-title">Abertura e cronograma</h2>
-              <p>Organize reconhecimentos, anúncios, hinos, orações, apoios e ordenanças.</p>
+              <p>Organize reconhecimentos, anúncios, hinos, orações, apoios e desobrigações.</p>
             </div>
           </div>
           <div class="field-grid">
@@ -151,14 +182,33 @@
                 </div>
               </div>
             </fieldset>
-            <div class="field field-wide">
-              <label for="sustaining">Apoios e desobrigações (opcional)</label>
-              <textarea id="sustaining" name="sustaining" rows="3" placeholder="Nomes e chamados para apoio ou desobrigação"></textarea>
-            </div>
-            <div class="field field-wide">
-              <label for="ordinance">Ordenanças (opcional)</label>
-              <textarea id="ordinance" name="ordinance" rows="2" placeholder="Preencha se houver uma ordenança"></textarea>
-            </div>
+            <fieldset class="field-wide assignment-form-group">
+              <legend>Apoios</legend>
+              <table class="assignment-form-table" aria-label="Cadastro de apoios">
+                <thead>
+                  <tr><th scope="col">Nome</th><th scope="col">Chamado</th></tr>
+                </thead>
+                <tbody id="support-entry-fields"></tbody>
+              </table>
+            </fieldset>
+            <fieldset class="field-wide assignment-form-group">
+              <legend>Desobrigações</legend>
+              <table class="assignment-form-table" aria-label="Cadastro de desobrigações">
+                <thead>
+                  <tr><th scope="col">Nome</th><th scope="col">Chamado</th></tr>
+                </thead>
+                <tbody id="release-entry-fields"></tbody>
+              </table>
+            </fieldset>
+            <fieldset class="field-wide assignment-form-group">
+              <legend>Ordenanças</legend>
+              <table class="assignment-form-table ordinance-form-table" aria-label="Cadastro de ordenanças">
+                <thead>
+                  <tr><th scope="col">Tipo de ordenança</th><th scope="col">Quem realiza</th><th scope="col">Observações</th></tr>
+                </thead>
+                <tbody id="ordinance-entry-fields"></tbody>
+              </table>
+            </fieldset>
           </div>
         </section>
 
@@ -221,7 +271,7 @@
 
     </section>
 
-    <section id="agenda-screen" class="app-screen" aria-labelledby="agenda-page-title">
+    <section id="agenda-screen" class="app-screen" aria-labelledby="agenda-page-title" hidden>
       <header class="screen-header">
         <div class="page-intro">
           <p class="eyebrow">REUNIÃO SACRAMENTAL</p>
@@ -245,10 +295,17 @@
         </div>
         <article id="agenda-preview" class="agenda-preview" aria-label="Agenda sacramental gerada" hidden>
           <div id="agenda-first-page" class="agenda-first-page">
-            <header class="print-heading">
-              <h2>Reunião sacramental</h2>
-            </header>
-            <div id="preview-content"></div>
+            <img class="agenda-watermark" src="salt-lake-temple-watermark.jpg" alt="" aria-hidden="true">
+            <div class="agenda-page-content">
+              <header class="print-heading">
+                <h2>Reunião sacramental</h2>
+              </header>
+              <div id="preview-content"></div>
+              <p class="agenda-image-credit">
+                Foto: <a href="https://commons.wikimedia.org/wiki/File:2019_Salt_Lake_Temple_01.jpg">Farragutful / Wikimedia Commons</a>
+                (<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>)
+              </p>
+            </div>
           </div>
           <div id="preview-continuation"></div>
           <button id="print-agenda" class="button button-print" type="button">Imprimir agenda</button>
@@ -262,5 +319,49 @@
     <span>BispadoManager</span>
     <span>Uma reunião organizada começa com uma boa preparação.</span>
   </footer>
+  <section class="secretario-chat" aria-label="Assistente virtual">
+    <button
+      id="assistant-toggle"
+      class="secretario-toggle"
+      type="button"
+      aria-label="Abrir conversa com SecretárioAI"
+      aria-controls="assistant-panel"
+      aria-expanded="false">
+      <img src="./assets/images/secretario-ai-avatar.png" alt="" width="64" height="64">
+    </button>
+    <aside id="assistant-panel" class="secretario-panel" aria-labelledby="assistant-title" hidden>
+      <header class="secretario-header">
+        <img src="./assets/images/secretario-ai-avatar.png" alt="" width="44" height="44">
+        <div>
+          <h2 id="assistant-title">SecretárioAI</h2>
+          <p>Assistente local em português</p>
+        </div>
+        <button id="assistant-start-guided" class="secretario-start-guided" type="button" aria-label="Montar uma nova agenda" title="Montar uma nova agenda">
+          <svg aria-hidden="true" viewBox="0 0 32 32" fill="none">
+            <path d="M7 3.5h11l5 5v18H7a2 2 0 0 1-2-2v-19a2 2 0 0 1 2-2Z" />
+            <path d="M18 3.5v5h5M9 13h8M9 17h6" />
+            <circle cx="22" cy="22" r="7" />
+            <path class="secretario-new-agenda-plus" d="M22 18.5v7M18.5 22h7" />
+          </svg>
+        </button>
+        <button id="assistant-close" class="secretario-close" type="button" aria-label="Fechar conversa">×</button>
+      </header>
+      <div id="assistant-messages" class="secretario-messages" role="log" aria-live="polite" aria-relevant="additions">
+        <p class="secretario-message secretario-message-assistant">Olá! Sou o SecretárioAI, assistente virtual do BispadoManager. Posso ajudar a organizar a agenda sacramental e localizar informações em fontes oficiais da Igreja.</p>
+      </div>
+      <div id="assistant-suggestions" class="secretario-suggestions" aria-label="Perguntas sugeridas">
+        <button type="button">Como monto a agenda?</button>
+        <button type="button">Como imprimo a agenda?</button>
+        <button type="button">Os dados ficam salvos?</button>
+      </div>
+      <div id="assistant-quick-replies" class="secretario-suggestions secretario-quick-replies" aria-label="Respostas rápidas" hidden></div>
+      <form id="assistant-form" class="secretario-form">
+        <label class="sr-only" for="assistant-input">Digite sua pergunta</label>
+        <input id="assistant-input" name="question" type="text" maxlength="500" placeholder="Digite sua pergunta..." autocomplete="off">
+        <button type="submit" aria-label="Enviar pergunta">Enviar</button>
+      </form>
+      <p class="secretario-disclaimer">Respostas locais preparadas; não é uma IA generativa.</p>
+    </aside>
+  </section>
 </body>
 </html>

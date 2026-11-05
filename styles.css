@@ -77,10 +77,79 @@ input {
   font-size: 0.83rem;
 }
 
+.primary-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.primary-nav a {
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.primary-nav a:hover,
+.primary-nav a[aria-current="page"] {
+  background: var(--green-soft);
+  color: var(--green-dark);
+}
+
 main {
   width: min(1200px, 90%);
   margin: 0 auto;
   padding: 3.2rem 0 4.5rem;
+}
+
+.home-dashboard {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--white);
+  box-shadow: 0 12px 35px rgb(32 51 47 / 4%);
+}
+
+.dashboard-heading {
+  margin-bottom: 1.2rem;
+}
+
+.dashboard-heading .eyebrow {
+  margin-bottom: 0.45rem;
+}
+
+.dashboard-heading h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+}
+
+.indicator-placeholder {
+  display: flex;
+  min-height: 10rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  border: 1px dashed #cbd4cc;
+  border-radius: 0.7rem;
+  background: #fdfdfc;
+  color: var(--muted);
+  text-align: center;
+}
+
+.indicator-placeholder .placeholder-icon {
+  color: var(--green);
+  font-size: 1.5rem;
+}
+
+.indicator-placeholder p {
+  margin: 0;
+  font-size: 0.85rem;
 }
 
 .page-intro {
@@ -475,6 +544,8 @@ p {
 
 .agenda-first-page,
 #preview-continuation > .agenda-continuation {
+  position: relative;
+  isolation: isolate;
   width: min(100%, 210mm);
   min-height: 297mm;
   margin-right: auto;
@@ -483,6 +554,33 @@ p {
   border: 1px solid var(--line);
   background: var(--white);
   box-shadow: 0 8px 24px rgb(32 51 47 / 8%);
+}
+
+.agenda-watermark {
+  position: absolute;
+  z-index: 0;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  object-fit: cover;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.agenda-image-credit {
+  margin: 0.7rem 0 0;
+  color: var(--muted);
+  font-size: 0.58rem;
+  text-align: right;
+}
+
+.agenda-image-credit a {
+  color: inherit;
+}
+
+.agenda-page-content {
+  position: relative;
+  z-index: 1;
 }
 
 .agenda-first-page::before,
@@ -524,10 +622,10 @@ p {
 .agenda-message-block {
   margin-bottom: 0.75rem;
   padding: 0.9rem;
-  border: 1px solid var(--line);
+  border: 1px solid rgb(111 126 120 / 55%);
   border-left: 3px solid var(--gold);
   border-radius: 0.65rem;
-  background: #fdfcf9;
+  background: rgb(253 252 249 / 42%);
   break-inside: avoid;
 }
 
@@ -574,32 +672,20 @@ p {
 }
 
 .agenda-assignments-block .agenda-entry {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.15rem;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.15rem 0.3rem;
 }
 
 .agenda-assignments-block .agenda-entry + .agenda-entry {
-  margin-top: 0.7rem;
-}
-
-.agenda-assignments-block .agenda-entry-row {
-  width: 100%;
-  margin-top: 0.7rem;
-  gap: 0.55rem;
-}
-
-.agenda-assignments-block .agenda-assignment-leaderships {
-  margin-top: 0;
-}
-
-.agenda-assignments-block .agenda-entry-row .agenda-entry + .agenda-entry {
-  margin-top: 0;
+  margin-top: 0.35rem;
 }
 
 .agenda-assignments-block .agenda-entry-label {
   color: var(--green);
   font-size: 0.68rem;
+  text-align: left;
 }
 
 .agenda-assignments-block .agenda-entry-value {
@@ -654,28 +740,177 @@ p {
   line-height: 1.55;
 }
 
-.agenda-continuation-writing-lines {
-  min-height: 7rem;
-}
-
 .agenda-continuation {
   display: grid;
   gap: 0.75rem;
 }
 
+.agenda-continuation-content {
+  display: grid;
+  grid-template-rows: 1fr 1fr 0.8fr 1.3fr;
+  gap: 0.75rem;
+  height: 100%;
+}
+
 .agenda-continuation-card {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
   margin-bottom: 0;
   break-inside: avoid;
 }
 
-.agenda-continuation-card > p {
-  margin: 0;
-  color: var(--ink);
-  font-size: 0.84rem;
-  line-height: 1.55;
-  overflow-wrap: anywhere;
-  white-space: pre-line;
+.agenda-assignment-table,
+.assignment-form-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
+
+.agenda-assignment-table {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: 100%;
+  font-size: 0.76rem;
+}
+
+.agenda-assignment-table thead {
+  display: block;
+}
+
+.agenda-assignment-table tbody {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-rows: repeat(var(--row-count), minmax(0, 1fr));
+}
+
+.agenda-assignment-table thead tr,
+.agenda-assignment-table tbody tr {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: repeat(var(--column-count), minmax(0, 1fr));
+}
+
+.agenda-assignment-table th,
+.agenda-assignment-table td {
+  min-width: 0;
+  padding: 0.22rem 0.4rem;
+  border-bottom: 1px solid rgb(111 126 120 / 55%);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.agenda-assignment-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-assignment-table th {
+  color: var(--green);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.agenda-assignment-table th:nth-child(1),
+.agenda-assignment-table td:nth-child(1) {
+  width: auto;
+}
+
+.agenda-assignment-table th:nth-child(2),
+.agenda-assignment-table td:nth-child(2) {
+  width: auto;
+}
+
+.agenda-assignment-table th:nth-child(3),
+.agenda-assignment-table td:nth-child(3) {
+  width: auto;
+}
+
+.agenda-assignment-table:has(th:nth-child(3)) thead tr,
+.agenda-assignment-table:has(th:nth-child(3)) tbody tr {
+  grid-template-columns: 0.9fr 0.9fr 1.2fr;
+}
+
+.agenda-continuation-card > .agenda-assignment-table {
+  min-height: 0;
+}
+
+.agenda-testimony-lines {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  flex-direction: column;
+  border-collapse: collapse;
+}
+
+.agenda-testimony-lines tbody {
+  display: grid;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-rows: repeat(var(--row-count), minmax(0, 1fr));
+}
+
+.agenda-testimony-lines tr,
+.agenda-testimony-lines td {
+  display: block;
+  min-height: 0;
+}
+
+.agenda-testimony-lines td {
+  height: 100%;
+  border-bottom: 1px solid rgb(111 126 120 / 55%);
+}
+
+.ordinance-form-table th,
+.ordinance-form-table td {
+  width: 33.333%;
+}
+
+.assignment-form-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: #fdfdfc;
+}
+
+.assignment-form-group legend {
+  padding: 0 0.4rem;
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.assignment-form-table th {
+  padding: 0.25rem 0.4rem;
+  color: var(--green);
+  font-size: 0.72rem;
+  text-align: left;
+}
+
+.assignment-form-table td {
+  padding: 0.15rem 0.35rem;
+}
+
+.assignment-form-table input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #dfe5df;
+  border-radius: 0.4rem;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+
 
 .agenda-opening-block .agenda-entry-value {
   flex: 1 1 auto;
@@ -819,8 +1054,10 @@ p {
 
 @media (max-width: 560px) {
   .site-header {
+    flex-wrap: wrap;
+    gap: 0.35rem 0.5rem;
     min-height: 64px;
-    padding: 0 5%;
+    padding: 0.65rem 5%;
   }
 
   .brand {
@@ -828,8 +1065,19 @@ p {
     font-size: 0.9rem;
   }
 
+  .primary-nav {
+    flex-basis: 100%;
+    justify-content: flex-start;
+    margin-left: -0.55rem;
+  }
+
+  .primary-nav a {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.72rem;
+  }
+
   .header-caption {
-    font-size: 0.7rem;
+    display: none;
   }
 
   main {
@@ -861,6 +1109,12 @@ p {
   .agenda-form {
     border-radius: 0.75rem;
     padding: 1rem;
+  }
+
+  .home-dashboard {
+    margin: 0 0.75rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
   }
 
   .hymn-group,
@@ -956,7 +1210,7 @@ p {
 @media print {
   @page {
     size: A4;
-    margin: 12mm;
+    margin: 0;
   }
 
   html {
@@ -965,9 +1219,62 @@ p {
 
   body {
     min-width: 0;
+    margin: 0;
     background: var(--white);
     color: #111;
     font-family: Georgia, "Times New Roman", serif;
+  }
+
+  body > * {
+    display: none !important;
+  }
+
+  body > main {
+    display: block !important;
+  }
+
+  body > main > * {
+    display: none !important;
+  }
+
+  body > main > #agenda-screen {
+    display: block !important;
+  }
+
+  body > main > #agenda-screen[hidden] {
+    display: none !important;
+  }
+
+  #agenda-screen > * {
+    display: none !important;
+  }
+
+  #agenda-screen > .preview-panel {
+    display: block !important;
+  }
+
+  .preview-panel > * {
+    display: none !important;
+  }
+
+  .preview-panel > #agenda-preview {
+    display: block !important;
+  }
+
+  .preview-panel > #agenda-preview[hidden] {
+    display: none !important;
+  }
+
+  #agenda-preview > * {
+    display: none !important;
+  }
+
+  #agenda-preview > .agenda-first-page {
+    display: flex !important;
+  }
+
+  #agenda-preview > #preview-continuation {
+    display: block !important;
   }
 
   .site-header,
@@ -1003,10 +1310,13 @@ p {
   }
 
   .agenda-first-page {
-    width: 186mm;
+    width: 210mm;
+    height: calc(297mm - 12px);
     min-height: 0;
+    flex-direction: column;
     margin: 0;
-    padding: 0;
+    padding: 12mm;
+    box-sizing: border-box;
     border: 0;
     background: transparent;
     box-shadow: none;
@@ -1027,14 +1337,88 @@ p {
     border: 0;
   }
 
-  #preview-continuation > .agenda-continuation {
-    width: auto;
-    min-height: 0;
+  #preview-continuation:not(:empty) {
     margin: 0;
     padding: 0;
     border: 0;
+  }
+
+  #preview-continuation > .agenda-continuation {
+    width: 210mm;
+    height: calc(297mm - 12px);
+    min-height: 0;
+    margin: 0;
+    padding: 12mm;
+    box-sizing: border-box;
+    border: 0;
     background: transparent;
     box-shadow: none;
+    display: block;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .agenda-first-page > .agenda-page-content {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  #preview-content {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  #preview-content > .agenda-message-block {
+    flex: 0 0 auto;
+  }
+
+  #preview-content > .agenda-message-block:last-child {
+    margin-bottom: 0;
+  }
+
+  #preview-continuation > .agenda-continuation {
+    position: relative;
+  }
+
+  .agenda-watermark {
+    inset: 0;
+    width: 100%;
+    height: calc(100% + 12px);
+    opacity: 0.08;
+  }
+
+  .agenda-continuation-content {
+    position: absolute;
+    inset: 12mm;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) minmax(0, 0.8fr) minmax(0, 1.3fr);
+    gap: 0.5rem;
+    height: auto;
+  }
+
+  .agenda-continuation-card {
+    overflow: hidden;
+  }
+
+  .agenda-continuation-card > .agenda-assignment-table,
+  .agenda-testimony-lines {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+
+  .agenda-assignment-table td,
+  .agenda-assignment-table th {
+    font-size: calc(0.7rem * var(--print-table-font-scale, 1));
+  }
+
+  .agenda-assignment-table th {
+    font-size: calc(0.68rem * var(--print-table-font-scale, 1));
   }
 
   .print-heading {
@@ -1060,13 +1444,8 @@ p {
     line-height: 1.35;
   }
 
-  .agenda-assignments-block .agenda-entry + .agenda-entry,
-  .agenda-assignments-block .agenda-entry-row {
+  .agenda-assignments-block .agenda-entry + .agenda-entry {
     margin-top: 0.4rem;
-  }
-
-  .agenda-assignments-block .agenda-entry-row {
-    gap: 0.35rem;
   }
 
   .agenda-details-card .agenda-entry + .agenda-entry {
@@ -1092,5 +1471,22 @@ p {
   .agenda-continuation {
     break-before: page;
     page-break-before: always;
+  }
+
+  .agenda-continuation-card {
+    padding: 0.4rem 0.55rem;
+  }
+
+  .agenda-assignment-table {
+    font-size: 0.7rem;
+  }
+
+  .agenda-assignment-table th,
+  .agenda-assignment-table td {
+    padding: 0.12rem 0.3rem;
+  }
+
+  .agenda-testimony-lines {
+    font-size: 0.68rem;
   }
 }

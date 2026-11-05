@@ -1,6 +1,7 @@
 const config = window.BISPADO_SUPABASE_CONFIG || {};
 const status = document.querySelector("#app-status");
 const form = document.querySelector("#agenda-form");
+const homeScreen = document.querySelector("#home-screen");
 const createScreen = document.querySelector("#create-screen");
 const agendaScreen = document.querySelector("#agenda-screen");
 const preview = document.querySelector("#agenda-preview");
@@ -27,10 +28,31 @@ function fieldValue(id) {
 }
 
 function showScreen(screen) {
-  const showAgenda = screen === "agenda";
-  agendaScreen.hidden = !showAgenda;
-  createScreen.hidden = showAgenda;
-  (showAgenda ? agendaScreen : createScreen).querySelector("h1").focus();
+  const screens = {
+    home: homeScreen,
+    agenda: agendaScreen,
+    create: createScreen
+  };
+  const activeScreen = screens[screen];
+
+  if (!activeScreen) {
+    throw new Error(`Tela desconhecida: ${screen}`);
+  }
+
+  for (const screenElement of Object.values(screens)) {
+    screenElement.hidden = screenElement !== activeScreen;
+  }
+
+  const navigationScreen = screen === "create" ? "agenda" : screen;
+  document.querySelectorAll(".primary-nav [data-screen]").forEach((link) => {
+    if (link.dataset.screen === navigationScreen) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+
+  activeScreen.querySelector("h1").focus();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -199,6 +221,15 @@ function createHymnRow(label, hymnName, hymnNumber) {
   return hymnRow;
 }
 
+function createAgendaWatermark() {
+  const watermark = document.createElement("img");
+  watermark.className = "agenda-watermark";
+  watermark.src = "salt-lake-temple-watermark.jpg";
+  watermark.alt = "";
+  watermark.setAttribute("aria-hidden", "true");
+  return watermark;
+}
+
 function addOpeningBlock(container, hymnName, hymnNumber, prayer) {
   const block = document.createElement("section");
   block.className = "agenda-message-block agenda-opening-block";
@@ -236,60 +267,137 @@ function addSacramentalBlock(container, hymnName, hymnNumber) {
   container.append(block);
 }
 
-function addContinuationBlock(container, ordinance, sustaining) {
+function createAssignmentFormRows(prefix, sectionLabel, fields, count) {
+  const rows = document.querySelector(`#${prefix}-entry-fields`);
+
+  for (let index = 1; index <= count; index += 1) {
+    const row = document.createElement("tr");
+
+    for (const field of fields) {
+      const cell = document.createElement("td");
+      const input = document.createElement("input");
+      input.id = `${prefix}-${field}-${index}`;
+      input.name = input.id;
+      input.type = "text";
+      const fieldLabel = {
+        name: "Nome",
+        calling: "Chamado",
+        type: "Tipo de ordenança",
+        officiant: "Quem realiza",
+        notes: "Observações"
+      }[field];
+      input.setAttribute("aria-label", `${sectionLabel} ${index} - ${fieldLabel}`);
+      cell.append(input);
+      row.append(cell);
+    }
+
+    rows.append(row);
+  }
+}
+
+function getAssignmentEntries(prefix, fields, count) {
+  return Array.from({ length: count }, (_, index) =>
+    Object.fromEntries(fields.map((field) => [field, fieldValue(`${prefix}-${field}-${index + 1}`)]))
+  );
+}
+
+function addAssignmentTable(container, entries, label, columns) {
+  const table = document.createElement("table");
+  table.className = "agenda-assignment-table";
+  table.setAttribute("aria-label", label);
+  table.setAttribute("role", "table");
+  table.style.setProperty("--column-count", String(columns.length));
+  table.style.setProperty("--row-count", String(entries.length));
+
+  const header = document.createElement("thead");
+  header.setAttribute("role", "rowgroup");
+  const headerRow = document.createElement("tr");
+  headerRow.setAttribute("role", "row");
+  for (const title of columns.map((column) => column.label)) {
+    const cell = document.createElement("th");
+    cell.scope = "col";
+    cell.setAttribute("role", "columnheader");
+    cell.textContent = title;
+    headerRow.append(cell);
+  }
+  header.append(headerRow);
+  table.append(header);
+
+  const body = document.createElement("tbody");
+  body.setAttribute("role", "rowgroup");
+  for (const entry of entries) {
+    const row = document.createElement("tr");
+    row.setAttribute("role", "row");
+    for (const column of columns) {
+      const cell = document.createElement("td");
+      cell.setAttribute("role", "cell");
+      cell.textContent = entry[column.field];
+      if (entry[column.field]) {
+        cell.title = entry[column.field];
+      }
+      row.append(cell);
+    }
+    body.append(row);
+  }
+  table.append(body);
+  container.append(table);
+}
+
+function addContinuationBlock(container, supportEntries, releaseEntries, ordinanceEntries) {
   const continuation = document.createElement("div");
   continuation.className = "agenda-continuation";
+  continuation.append(createAgendaWatermark());
 
-  const sustainingCard = document.createElement("section");
-  sustainingCard.className = "agenda-message-block agenda-continuation-card";
+  const pageContent = document.createElement("div");
+  pageContent.className = "agenda-page-content agenda-continuation-content";
 
-  const sustainingHeading = document.createElement("h3");
-  sustainingHeading.textContent = "Apoios e desobrigações";
-  sustainingCard.append(sustainingHeading);
+  for (const { title, entries, columns } of [
+    { title: "Apoios", entries: supportEntries, columns: [{ field: "name", label: "Nome" }, { field: "calling", label: "Chamado" }] },
+    { title: "Desobrigações", entries: releaseEntries, columns: [{ field: "name", label: "Nome" }, { field: "calling", label: "Chamado" }] },
+    { title: "Ordenanças", entries: ordinanceEntries, columns: [{ field: "type", label: "Tipo de ordenança" }, { field: "officiant", label: "Quem realiza" }, { field: "notes", label: "Observações" }] }
+  ]) {
+    const card = document.createElement("section");
+    card.className = "agenda-message-block agenda-continuation-card";
 
-  if (sustaining) {
-    const details = document.createElement("p");
-    details.textContent = sustaining;
-    sustainingCard.append(details);
-  } else {
-    const writingLines = document.createElement("div");
-    writingLines.className = "agenda-writing-lines agenda-continuation-writing-lines";
-    writingLines.setAttribute("aria-label", "Espaço para escrever apoios e desobrigações à mão");
-
-    for (let line = 0; line < 6; line += 1) {
-      writingLines.append(document.createElement("span"));
-    }
-
-    sustainingCard.append(writingLines);
+    const heading = document.createElement("h3");
+    heading.textContent = title;
+    card.append(heading);
+    addAssignmentTable(card, entries, title, columns);
+    pageContent.append(card);
   }
-  continuation.append(sustainingCard);
 
-  const ordinanceCard = document.createElement("section");
-  ordinanceCard.className = "agenda-message-block agenda-continuation-card";
+  const testimonies = document.createElement("section");
+  testimonies.className = "agenda-message-block agenda-continuation-card agenda-testimonies-card";
+  const testimoniesHeading = document.createElement("h3");
+  testimoniesHeading.textContent = "Testemunhos";
+  testimonies.append(testimoniesHeading);
 
-  const ordinanceHeading = document.createElement("h3");
-  ordinanceHeading.textContent = "Ordenanças";
-  ordinanceCard.append(ordinanceHeading);
-
-  if (ordinance) {
-    const details = document.createElement("p");
-    details.textContent = ordinance;
-    ordinanceCard.append(details);
-  } else {
-    const writingLines = document.createElement("div");
-    writingLines.className = "agenda-writing-lines agenda-continuation-writing-lines";
-    writingLines.setAttribute("aria-label", "Espaço para escrever ordenanças à mão");
-
-    for (let line = 0; line < 6; line += 1) {
-      writingLines.append(document.createElement("span"));
-    }
-
-    ordinanceCard.append(writingLines);
+  const testimonyLines = document.createElement("table");
+  testimonyLines.className = "agenda-testimony-lines";
+  testimonyLines.setAttribute("aria-label", "Espaço para escrever testemunhos à mão");
+  testimonyLines.setAttribute("role", "table");
+  testimonyLines.style.setProperty("--row-count", "15");
+  const testimonyBody = document.createElement("tbody");
+  testimonyBody.setAttribute("role", "rowgroup");
+  for (let line = 0; line < 15; line += 1) {
+    const row = document.createElement("tr");
+    row.setAttribute("role", "row");
+    const cell = document.createElement("td");
+    cell.setAttribute("role", "cell");
+    row.append(cell);
+    testimonyBody.append(row);
   }
-  continuation.append(ordinanceCard);
+  testimonyLines.append(testimonyBody);
+  testimonies.append(testimonyLines);
+  pageContent.append(testimonies);
 
+  continuation.append(pageContent);
   container.append(continuation);
 }
+
+createAssignmentFormRows("support", "Apoio", ["name", "calling"], 10);
+createAssignmentFormRows("release", "Desobrigação", ["name", "calling"], 10);
+createAssignmentFormRows("ordinance", "Ordenança", ["type", "officiant", "notes"], 3);
 
 function renderAgenda() {
   previewContent.replaceChildren();
@@ -313,21 +421,22 @@ function renderAgenda() {
   const assignmentsHeading = document.createElement("h3");
   assignmentsHeading.textContent = "Designações";
   assignments.append(assignmentsHeading);
-  addEntryRow(assignments, [
-    { label: "Presidida por", value: fieldValue("president") },
-    { label: "Dirigida por", value: fieldValue("conducting") }
-  ], "agenda-assignment-leaderships");
-  addEntryRow(assignments, [
+  for (const entry of [
+    { label: "Presidida", value: fieldValue("president") },
+    { label: "Dirigida", value: fieldValue("conducting") },
     { label: "Regente", value: fieldValue("regent") },
     { label: "Organista", value: fieldValue("organist") },
-    { label: "Recepcionista", value: fieldValue("receptionist") }
-  ]);
+    { label: "Recepção", value: fieldValue("receptionist") }
+  ]) {
+    addEntry(assignments, entry.label, entry.value);
+  }
   previewContent.append(assignments);
   addAnnouncementsBlock(previewContent, fieldValue("announcements"));
   const openingHymnName = fieldValue("opening-hymn-name");
   const openingHymnNumber = fieldValue("opening-hymn-number");
-  const ordinance = fieldValue("ordinance");
-  const sustaining = fieldValue("sustaining");
+  const supportEntries = getAssignmentEntries("support", ["name", "calling"], 10);
+  const releaseEntries = getAssignmentEntries("release", ["name", "calling"], 10);
+  const ordinanceEntries = getAssignmentEntries("ordinance", ["type", "officiant", "notes"], 3);
   addOpeningBlock(
     previewContent,
     openingHymnName,
@@ -369,7 +478,7 @@ function renderAgenda() {
     },
     { label: "Última oração", value: fieldValue("closing-prayer") }
   ]);
-  addContinuationBlock(previewContinuation, ordinance, sustaining);
+  addContinuationBlock(previewContinuation, supportEntries, releaseEntries, ordinanceEntries);
 
   preview.hidden = false;
   placeholder.hidden = true;
@@ -388,18 +497,25 @@ const exampleValues = {
   "opening-hymn-name": "Vinde, Ó Santos",
   "opening-hymn-number": "20",
   "opening-prayer": "Irmã Exemplo",
-  "sacramental-hymn": "Em Humildade, Senhor",
+  "sacramental-hymn": "Ó Deus Senhor Eterno",
   "sacramental-hymn-number": "98",
-  sustaining: "Apoio: Carlos Exemplo para o chamado de professor.\nDesobrigação: Pedro Exemplo do chamado de secretário.",
-  "sacramental-hymn": "Em Humildade, Senhor",
+  "special-hymn": "Sou um Filho de Deus",
+  "special-hymn-number": "193",
+  "closing-hymn": "Comigo Habita",
+  "closing-hymn-number": "97",
+  "support-name-1": "Carlos Exemplo",
+  "support-calling-1": "Professor",
+  "release-name-1": "Pedro Exemplo",
+  "release-calling-1": "Secretário",
+  "ordinance-type-1": "Bênção",
+  "ordinance-officiant-1": "Carlos Exemplo",
+  "ordinance-notes-1": "Durante a reunião",
   "speaker-1-name": "Evaldo Lucas de souza",
   "speaker-1-topic": "A importância da oração diária",
   "speaker-2-name": "Eliene de jesus Santos",
   "speaker-2-topic": "Servir ao próximo com amor",
   "speaker-3-name": "Rafael Moroni Alves Mesquita",
   "speaker-3-topic": "Encontrar paz em Jesus Cristo",
-  "special-hymn": "Sou um Filho de Deus",
-  "closing-hymn": "Comigo Habita",
   "closing-prayer": "Ariannys Milena Torres Valest"
 };
 
@@ -426,29 +542,125 @@ document.querySelector("#create-agenda-button").addEventListener("click", () => 
   showScreen("create");
 });
 
+document.querySelector("#open-agenda-button").addEventListener("click", () => {
+  showScreen("agenda");
+});
+
+document.querySelectorAll(".primary-nav [data-screen]").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    showScreen(link.dataset.screen);
+  });
+});
+
 document.querySelector("#cancel-agenda-button").addEventListener("click", () => {
   showScreen("agenda");
 });
 
 document.querySelector("#print-agenda").addEventListener("click", () => {
-  window.print();
+  const printWindow = window.open("about:blank", "_blank");
+
+  if (!printWindow) {
+    status.textContent = "Permita pop-ups para abrir a impressão da ata.";
+    return;
+  }
+
+  const printDocument = printWindow.document;
+  printDocument.documentElement.lang = "pt-BR";
+  printDocument.head.replaceChildren();
+
+  const base = printDocument.createElement("base");
+  base.href = document.baseURI;
+
+  const title = printDocument.createElement("title");
+  title.textContent = "Agenda sacramental";
+
+  const stylesheet = printDocument.createElement("link");
+  stylesheet.rel = "stylesheet";
+  stylesheet.href = new URL("styles.css", document.baseURI).href;
+
+  printDocument.head.append(base, title, stylesheet);
+
+  const main = printDocument.createElement("main");
+  const screen = printDocument.createElement("section");
+  screen.id = "agenda-screen";
+  const panel = printDocument.createElement("aside");
+  panel.className = "preview-panel";
+  const printPreview = printDocument.createElement("article");
+  printPreview.id = "agenda-preview";
+  printPreview.className = "agenda-preview";
+  printPreview.append(
+    agendaFirstPage.cloneNode(true),
+    previewContinuation.cloneNode(true)
+  );
+  panel.append(printPreview);
+  screen.append(panel);
+  main.append(screen);
+  printDocument.body.replaceChildren(main);
+
+  stylesheet.addEventListener("load", async () => {
+    try {
+      await Promise.all(Array.from(printDocument.images, (image) => image.decode()));
+      await printDocument.fonts.ready;
+
+      const fitPageOne = () => {
+        const root = printDocument.documentElement;
+        const pageContent = printDocument.querySelector(".agenda-first-page > .agenda-page-content");
+        let minimumScale = 0.5;
+        let maximumScale = 1;
+        root.style.setProperty("--print-font-size", "16px");
+
+        if (pageContent.scrollHeight > pageContent.clientHeight + 1) {
+          for (let attempt = 0; attempt < 14; attempt += 1) {
+            const scale = (minimumScale + maximumScale) / 2;
+            root.style.setProperty("--print-font-size", `${16 * scale}px`);
+
+            if (pageContent.scrollHeight <= pageContent.clientHeight + 1) {
+              minimumScale = scale;
+            } else {
+              maximumScale = scale;
+            }
+          }
+
+          root.style.setProperty("--print-font-size", `${16 * minimumScale}px`);
+        }
+      };
+
+      printWindow.addEventListener("beforeprint", () => {
+        fitPageOne();
+      }, { once: true });
+      printWindow.addEventListener("afterprint", () => printWindow.close(), { once: true });
+      printWindow.focus();
+      printWindow.print();
+    } catch (error) {
+      printWindow.close();
+      status.textContent = "Não foi possível preparar a impressão da ata.";
+      console.error("Falha ao preparar a impressão da ata.", error);
+    }
+  }, { once: true });
+
+  stylesheet.addEventListener("error", () => {
+    printWindow.close();
+    status.textContent = "Não foi possível carregar o estilo de impressão da ata.";
+  }, { once: true });
 });
 
 window.addEventListener("beforeprint", () => {
   const root = document.documentElement;
+  const agendaPageContent = agendaFirstPage.querySelector(".agenda-page-content");
   const baseFontSize = 16;
   const printableHeight = (297 - 24) * 96 / 25.4 - 12;
-  let minimumFit = 0;
+  let minimumFit = 0.5;
   let maximumFit = 1;
 
   root.style.setProperty("--print-font-size", `${baseFontSize}px`);
 
-  if (agendaFirstPage.getBoundingClientRect().height > printableHeight) {
+  if (agendaPageContent.getBoundingClientRect().height > printableHeight) {
     for (let attempt = 0; attempt < 16; attempt += 1) {
       const fit = (minimumFit + maximumFit) / 2;
       root.style.setProperty("--print-font-size", `${baseFontSize * fit}px`);
 
-      if (agendaFirstPage.getBoundingClientRect().height <= printableHeight) {
+      if (agendaPageContent.getBoundingClientRect().height <= printableHeight) {
         minimumFit = fit;
       } else {
         maximumFit = fit;
