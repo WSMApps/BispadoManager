@@ -390,102 +390,102 @@ window.SECRETARIO_HYMN_CATALOG = Object.freeze([
   {
     "title": "Ó Deus, Senhor Eterno",
     "number": 98,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Ao Partilhar de Teu Amor",
     "number": 99,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Entoai a Deus Louvor",
     "number": 100,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Deus, Escuta-nos Orar",
     "number": 101,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Nossa Humilde Prece Atende",
     "number": 102,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Enquanto unidos em Amor",
     "number": 103,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Quão Grato É Cantar Louvor",
     "number": 104,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Cantemos Todos a Jesus",
     "number": 105,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Jesus de Nazaré, Mestre e Rei",
     "number": 106,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Deus Tal Amor por Nós Mostrou",
     "number": 107,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Eis-nos à Mesa do Senhor",
     "number": 108,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Em uma Cruz Jesus Morreu",
     "number": 109,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Vede, Morreu o Redentor",
     "number": 110,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Lembrando a Morte de Jesus",
     "number": 111,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Assombro me Causa",
     "number": 112,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "No Monte do Calvário",
     "number": 113,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Da Corte Celestial",
     "number": 114,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Tão Humilde ao Nascer",
     "number": 115,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Sobre o Calvário",
     "number": 116,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Com Irmãos Nós Reunidos",
     "number": 117,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Manhã da Ressurreição",
@@ -862,12 +862,12 @@ window.SECRETARIO_HYMN_CATALOG = Object.freeze([
   {
     "title": "Partido o pão",
     "number": 1007,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Pão do Céu, Água Viva",
     "number": 1008,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Getsêmani",
@@ -928,7 +928,7 @@ window.SECRETARIO_HYMN_CATALOG = Object.freeze([
   {
     "title": "Faz-nos lembrar",
     "number": 1043,
-    "categories": ["sacramental"]
+    "categories": ["Hino sacramental"]
   },
   {
     "title": "Há no céu muitas estrelas",

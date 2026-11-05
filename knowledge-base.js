@@ -74,8 +74,12 @@ window.SECRETARIO_KNOWLEDGE_BASE = Object.freeze([
     answer: "O capítulo 3 apresenta princípios relacionados ao sacerdócio. Para questões de autoridade, chaves e responsabilidades, consulte o texto integral e vigente do capítulo."
   },
   {
+    phrases: ["reuniao de conselho", "reunioes de conselho", "reuniao do conselho", "reunioes do conselho", "me fale sobre reuniao de conselho", "fale sobre reuniao de conselho"],
+    answer: "O Manual Geral descreve vários conselhos, com propósitos diferentes. Na ala, o conselho da ala (29.2.5) coordena o apoio a pessoas e famílias; o conselho de jovens (29.2.6) se concentra nos jovens; e a reunião do bispado (29.2.4) trata dos assuntos da ala. Na estaca, o conselho da estaca (29.3.7) coordena o trabalho entre alas, enquanto o sumo conselho (29.3.6) aconselha a presidência da estaca. Em geral, esses conselhos são espaços para aconselhar-se e coordenar serviço, não apenas para repassar avisos. Se você disser qual deles quer conhecer, posso explicar participantes, frequência e responsabilidades."
+  },
+  {
     phrases: ["lideranca e conselhos", "conselhos da igreja", "como funcionam os conselhos"],
-    answer: "O capítulo 4 aborda liderança e conselhos na Igreja. A composição e as responsabilidades dependem do conselho; consulte o capítulo vigente antes de tomar decisões."
+    answer: "O capítulo 4 aborda princípios de liderança e conselhos na Igreja. Para reuniões e responsabilidades específicas, o capítulo 29 descreve conselhos da ala e da estaca, entre outros. A composição depende do conselho; consulte as seções correspondentes na edição vigente."
   },
   {
     phrases: ["lideranca geral", "lideranca da area", "setenta de area"],
@@ -148,6 +152,7 @@ window.SECRETARIO_KNOWLEDGE_BASE = Object.freeze([
       "como fazer entrevista de ministracao",
       "como fazer entrevistas de ministracao",
       "o que conversar na entrevista de ministracao",
+      "entrevista com ministradores",
       "entrevista dos ministradores",
       "entrevistas dos ministradores"
     ],
@@ -184,7 +189,17 @@ window.SECRETARIO_KNOWLEDGE_BASE = Object.freeze([
   },
   {
     phrases: ["reunioes da igreja", "reuniao sacramental", "reunioes", "manual sobre reunioes", "o que diz o manual sobre reunioes", "reunioes dominicais", "reunioes da ala"],
-    answer: "O capítulo 29 reúne orientações sobre as reuniões da Igreja; a seção 29.2 trata da reunião sacramental. Para horários, responsabilidades e formato, consulte as seções correspondentes na edição vigente."
+    section: "29",
+    answer: "O capítulo 29 trata de reuniões da ala e da estaca, incluindo reunião sacramental, jejum e testemunhos, conferências, reuniões de bispado e conselhos. Também inclui orientações sobre funerais, orações, participação virtual, fotografias e gravações e interpretação. Os subtópicos indicam propósito, participantes e frequência quando aplicável. Diga o nome ou o número do item para eu detalhar uma reunião específica."
+  },
+  {
+    phrases: ["o que pode me falar sobre o manual", "me fale sobre o manual", "fale sobre o manual", "o que pode me dizer sobre o manual", "me fale do manual"],
+    answer: "O Manual Geral reúne orientações para a organização e o serviço na Igreja. O índice local foi preparado a partir do PDF enviado (versão 2/25) e permite buscar capítulos, subtítulos e páginas; também há resumos detalhados para as reuniões do capítulo 29 e alguns outros assuntos. Ele não reproduz o texto integral do manual, e a edição oficial pode ser atualizada. Posso ajudar com um tema ou uma referência específica; para instruções completas e atuais, consulte o Manual Geral oficial: https://www.churchofjesuschrist.org/study/manual/general-handbook?lang=por."
+  },
+  {
+    phrases: ["reuniao batismal", "reunioes batismais", "reuniao de batismo", "reunioes de batismo", "programa da reuniao batismal", "como e uma reuniao batismal"],
+    section: "18.7.2",
+    answer: "O item 18.7.2 orienta que a reunião batismal seja simples, breve e espiritualmente inspiradora. A programação pode incluir boas-vindas, hino e oração, uma ou duas mensagens breves sobre o evangelho, música, o batismo, um período reverente enquanto os participantes se trocam, confirmações, testemunho dos novos conversos se desejarem e encerramento. Para crianças com registro de membro, o bispado e a presidência da Primária aconselham-se com a família para planejar; para conversos, o planejamento é feito sob a direção do bispado com os líderes missionários e missionários de tempo integral. A reunião deve apoiar a ordenança e a experiência espiritual, sem se tornar longa ou formalista."
   },
   {
     phrases: ["chamados da igreja", "como escolher um chamado", "como funciona um chamado", "desobrigacao de um chamado"],
@@ -295,12 +310,12 @@ window.SECRETARIO_KNOWLEDGE_BASE = Object.freeze([
     answer: "O item 29.2.4 descreve a reunião do bispado como um conselho para tratar dos assuntos da ala, com atenção especial aos jovens. Participam o bispado, o secretário da ala e o secretário executivo; outros líderes podem ser convidados conforme a necessidade. Em geral, ocorre semanalmente. Os assuntos podem incluir fortalecer pessoas e famílias, ordenanças, chamados, recomendações missionárias, instruções da Igreja, orçamento e designações. Na prática, é um espaço de aconselhamento e decisão coordenada, não apenas de informes."
   },
   {
-    phrases: ["conselho da ala", "reuniao do conselho da ala", "quem participa do conselho da ala"],
+    phrases: ["conselho da ala", "reuniao do conselho da ala", "reuniao de conselho da ala", "quem participa do conselho da ala"],
     section: "29.2.5",
     answer: "O item 29.2.5 apresenta o conselho da ala como meio de coordenar o trabalho de salvação e exaltação e apoiar pessoas e famílias. Participam o bispado, secretários da ala e as presidências do quórum de élderes, Sociedade de Socorro, Moças, Primária e Escola Dominical; o bispo pode convidar outros conforme o assunto. Em geral reúne-se semanalmente, mas pode fazê-lo menos vezes. O bispo planeja e dirige; se estiver ausente, pode designar um conselheiro, mas decisões importantes não são tomadas sem ele. A orientação prática é aconselhar-se e coordenar ajuda concreta, com sensibilidade às necessidades individuais."
   },
   {
-    phrases: ["conselho de jovens da ala", "reuniao do conselho de jovens da ala", "jovens conselho da ala"],
+    phrases: ["conselho de jovens da ala", "reuniao do conselho de jovens da ala", "reuniao de conselho de jovens da ala", "jovens conselho da ala"],
     section: "29.2.6",
     answer: "O item 29.2.6 diz que o conselho de jovens da ala busca fortalecê-los e ajudá-los a participar do trabalho da Igreja. Participam o bispado, representantes dos quóruns do Sacerdócio Aarônico, presidentes de classe das Moças e a presidente das Moças; outros líderes podem ser convidados. Geralmente se reúne uma vez por mês. Os assuntos incluem necessidades dos jovens, inclusão de jovens menos ativos ou novos, serviço e atividades, ministração e orientação de presidências recém-chamadas. A presença dos jovens permite que as decisões considerem suas perspectivas e necessidades."
   },
@@ -350,12 +365,12 @@ window.SECRETARIO_KNOWLEDGE_BASE = Object.freeze([
     answer: "O item 29.3.5 descreve a reunião da presidência da estaca como conselho para tratar dos assuntos da estaca. Participam a presidência, o secretário e o secretário executivo, com outros convidados quando necessário; em geral ocorre semanalmente. Podem ser tratados o fortalecimento de membros e alas, chamados, recomendações missionárias, ordenações, instruções, orçamento e designações. A finalidade é deliberar e coordenar prioridades sob a direção do presidente da estaca."
   },
   {
-    phrases: ["reuniao do sumo conselho", "reunioes do sumo conselho"],
+    phrases: ["reuniao do sumo conselho", "reunioes do sumo conselho", "reuniao de conselho do sumo conselho"],
     section: "29.3.6",
     answer: "O item 29.3.6 indica que o sumo conselho se reúne, se possível, duas vezes por mês para aconselhar-se sobre o trabalho da estaca. Participam a presidência da estaca, o sumo conselho e os secretários da estaca; outros podem ser convidados. A pauta pode incluir instruções, fortalecimento de membros e famílias, designações, chamados, ordenações e planejamento de reuniões de liderança. A reunião também pode ser combinada no mesmo dia com uma reunião do conselho da estaca para reduzir deslocamentos e compromissos."
   },
   {
-    phrases: ["conselho da estaca", "reuniao do conselho da estaca"],
+    phrases: ["conselho da estaca", "reuniao do conselho da estaca", "reuniao de conselho da estaca"],
     section: "29.3.7",
     answer: "O item 29.3.7 orienta o conselho da estaca a aconselhar-se sobre como a estaca participa do trabalho da Igreja e fortalece membros e famílias. Participam a presidência da estaca, o sumo conselho, secretários e presidentes de algumas organizações; líderes de adultos solteiros podem participar se chamados. Reúne-se mensalmente, se possível. Além de instruções e relatórios, pode tratar de autossuficiência, necessidades materiais, preparação para emergências e serviço comunitário. A reunião deve produzir coordenação e ações úteis, não apenas relatórios."
   },

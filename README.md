@@ -90,10 +90,13 @@ Também responde a interações básicas, dúvidas sobre o site e pedidos de aju
 e permite abrir o cadastro ou a agenda pelo chat. O botão com ícone de folha e
 **+** no cabeçalho inicia a entrevista para uma nova agenda. Durante a
 entrevista, mostra respostas rápidas como **Sim**, **Não**, **Pular** e
-**Encerrar lista**. Não usa IA generativa, não
-envia perguntas ou dados a serviços externos e só usa na entrevista as
-respostas fornecidas pelo usuário. Perguntas fora dos tópicos conhecidos
-recebem uma resposta indicando essa limitação. O avatar está em
+**Encerrar lista**. O chat pode usar o modelo `llama-3.3-70b-versatile` pela API
+da Groq, com trechos relevantes da base local como contexto; sem chave, continua
+usando respostas locais preparadas. A conversa generativa envia a pergunta, o
+histórico recente e os trechos selecionados à Groq, mas não lê nem envia os
+campos preenchidos da agenda automaticamente. Não envie dados pessoais ou
+confidenciais. A chave direta no navegador fica visível aos visitantes e pode
+ser usada por terceiros, gerando consumo na conta. O avatar está em
 `assets/images/secretario-ai-avatar.png`.
 Também há respostas resumidas para as reuniões da ala, da estaca, conselhos,
 serviços fúnebres e orientações relacionadas do capítulo 29, além de assuntos
@@ -117,7 +120,15 @@ Para orientações completas, consulte as edições oficiais vigentes.
 
 1. Configure a URL do projeto e a chave pública `anon`/publishable em
    `supabase-config.js`.
-2. Na raiz do projeto, inicie um servidor estático:
+2. Para ativar respostas generativas, configure `groqApiKey` em
+   `secretario-ai-config.js` com uma chave criada na conta Groq. A chave enviada
+   ao navegador é pública. Para ativar a IA em um site público, a chave precisa
+   ser incluída no conteúdo servido e visitantes podem copiá-la e consumir a
+   cota da conta. Não use uma chave com acesso a outros recursos; configure
+   limites de uso no provedor e monitore o consumo. Um backend intermediário é
+   a opção recomendada para proteger a chave, embora não faça parte desta
+   configuração direta.
+3. Na raiz do projeto, inicie um servidor estático:
 
    ```powershell
    py -m http.server 8000

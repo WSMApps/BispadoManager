@@ -13,6 +13,7 @@
   <script src="knowledge-base.js" defer></script>
   <script src="manual-index.js" defer></script>
   <script src="hymn-catalog.js" defer></script>
+  <script src="secretario-ai-config.js" defer></script>
   <script src="chatbot.js" defer></script>
 </head>
 <body>
@@ -334,7 +335,7 @@
         <img src="./assets/images/secretario-ai-avatar.png" alt="" width="44" height="44">
         <div>
           <h2 id="assistant-title">SecretárioAI</h2>
-          <p>Assistente local em português</p>
+          <p>Ajuda local e IA Groq opcional</p>
         </div>
         <button id="assistant-start-guided" class="secretario-start-guided" type="button" aria-label="Montar uma nova agenda" title="Montar uma nova agenda">
           <svg aria-hidden="true" viewBox="0 0 32 32" fill="none">
@@ -360,7 +361,7 @@
         <input id="assistant-input" name="question" type="text" maxlength="500" placeholder="Digite sua pergunta..." autocomplete="off">
         <button type="submit" aria-label="Enviar pergunta">Enviar</button>
       </form>
-      <p class="secretario-disclaimer">Respostas locais preparadas; não é uma IA generativa.</p>
+      <p class="secretario-disclaimer">Configure uma chave Groq em secretario-ai-config.js para ativar a IA. Pergunta e referências seguem à Groq; não envie dados sensíveis. A chave no navegador é pública.</p>
     </aside>
   </section>
 </body>
