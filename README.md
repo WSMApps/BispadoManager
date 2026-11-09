@@ -91,17 +91,10 @@ Também responde a interações básicas, dúvidas sobre o site e pedidos de aju
 e permite abrir o cadastro ou a agenda pelo chat. O botão com ícone de folha e
 **+** no cabeçalho inicia a entrevista para uma nova agenda. Durante a
 entrevista, mostra respostas rápidas como **Sim**, **Não**, **Pular** e
-**Encerrar lista**. O chat carrega automaticamente um modelo
-`Llama-3.2-1B` quantizado com WebLLM e WebGPU, executado no próprio navegador.
-O primeiro uso baixa o modelo e os componentes necessários da internet; isso
-pode consumir centenas de megabytes ou mais, além de memória e recursos do
-dispositivo. Não há cobrança por pergunta nem chave de API, e as perguntas não
-saem do navegador para serem processadas. É necessário navegador e hardware com
-WebGPU; em dispositivos incompatíveis, as respostas locais preparadas continuam
-disponíveis. O modelo e a biblioteca são carregados de serviços externos
-([WebLLM](https://github.com/mlc-ai/web-llm) e
-[Hugging Face](https://huggingface.co/mlc-ai/Llama-3.2-1B-Instruct-q4f16_1-MLC)).
-O avatar está em
+**Encerrar lista**. O chat usa respostas preparadas e busca local por assunto no
+índice do Manual Geral; não carrega modelos generativos nem envia perguntas a
+serviços externos. A busca por palavras-chave retorna títulos, números de item
+e páginas para facilitar a consulta da edição oficial. O avatar está em
 `assets/images/secretario-ai-avatar.png`.
 Também há respostas resumidas para as reuniões da ala, da estaca, conselhos,
 serviços fúnebres e orientações relacionadas do capítulo 29, além de assuntos
@@ -125,9 +118,8 @@ Para orientações completas, consulte as edições oficiais vigentes.
 
 1. Configure a URL do projeto e a chave pública `anon`/publishable em
    `supabase-config.js`.
-2. A IA generativa roda automaticamente no navegador usando WebLLM/WebGPU.
-   É necessário internet para o primeiro download e um navegador compatível com
-   WebGPU; sem suporte, as respostas locais continuam disponíveis.
+2. O assistente funciona localmente, sem chave de API ou dependência de serviço
+   generativo externo.
 3. Na raiz do projeto, inicie um servidor estático:
 
    ```powershell

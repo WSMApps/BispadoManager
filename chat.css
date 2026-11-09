@@ -234,15 +234,6 @@
   padding: 0.7rem 0.8rem 0.3rem;
 }
 
-.secretario-ai-status {
-  margin: 0;
-  padding: 0.6rem 0.8rem 0;
-  color: var(--muted);
-  font-size: 0.65rem;
-  line-height: 1.4;
-  text-align: center;
-}
-
 .secretario-form input {
   width: 100%;
   min-width: 0;
