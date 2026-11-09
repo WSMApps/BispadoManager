@@ -395,7 +395,8 @@ p {
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
   min-height: 2.8rem;
   padding: 0.65rem 0.75rem;
@@ -418,7 +419,8 @@ p {
 }
 
 .field input:focus,
-.field textarea:focus {
+.field textarea:focus,
+.field select:focus {
   border-color: var(--green);
   box-shadow: 0 0 0 3px rgb(36 92 77 / 12%);
 }
@@ -433,6 +435,47 @@ p {
 
 .ward-field {
   grid-area: ward;
+}
+
+.ward-add-toggle {
+  align-self: flex-start;
+  min-height: 2rem;
+  margin-top: 0.1rem;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.72rem;
+}
+
+.ward-add-controls {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  background: var(--white);
+}
+
+.ward-add-controls[hidden] {
+  display: none;
+}
+
+.ward-add-controls label {
+  color: #40524c;
+  font-size: 0.73rem;
+  font-weight: 650;
+}
+
+.ward-add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ward-catalog-status {
+  min-height: 1rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
 }
 
 .president-field {

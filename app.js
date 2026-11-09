@@ -16,6 +16,23 @@ const draftStatus = document.querySelector("#draft-status");
 const previousStepButton = document.querySelector("#previous-step-button");
 const nextStepButton = document.querySelector("#next-step-button");
 const reviewAgendaButton = document.querySelector("#review-agenda-button");
+const wardSelect = document.querySelector("#ward");
+const wardCatalogStatus = document.querySelector("#ward-catalog-status");
+const addWardToggle = document.querySelector("#add-ward-toggle");
+const wardAddControls = document.querySelector("#ward-add-controls");
+const newWardName = document.querySelector("#new-ward-name");
+const saveWardButton = document.querySelector("#save-ward-button");
+const cancelWardButton = document.querySelector("#cancel-ward-button");
+const hymnSuggestions = document.querySelector("#hymn-catalog-options");
+const hymnCatalog = Array.isArray(window.SECRETARIO_HYMN_CATALOG)
+  ? window.SECRETARIO_HYMN_CATALOG
+  : [];
+const hymnFieldPairs = [
+  ["opening-hymn-name", "opening-hymn-number"],
+  ["sacramental-hymn", "sacramental-hymn-number"],
+  ["special-hymn", "special-hymn-number"],
+  ["closing-hymn", "closing-hymn-number"]
+];
 const draftStorageKey = "bispado-manager-agenda-draft-v1";
 let activeAgendaStep = 0;
 let draftStorageAvailable = true;
@@ -23,8 +40,10 @@ let draftStorageAvailable = true;
 const supabaseUrl = typeof config.url === "string" ? config.url.trim() : "";
 const supabaseAnonKey = typeof config.anonKey === "string" ? config.anonKey.trim() : "";
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl) {
   status.textContent = "Agenda disponível neste navegador. Supabase não configurado.";
+} else if (!supabaseAnonKey) {
+  status.textContent = "Agenda disponível neste navegador. Configure a chave pública do Supabase para sincronizar as alas.";
 } else if (typeof window.supabase?.createClient !== "function") {
   status.textContent = "Agenda disponível, mas não foi possível carregar a biblioteca do Supabase.";
 } else {
@@ -34,6 +53,64 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 function fieldValue(id) {
   return document.querySelector(`#${id}`).value.trim();
+}
+
+function normalizeHymnTitle(value) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function findHymnByTitle(title) {
+  const normalizedTitle = normalizeHymnTitle(title);
+  return hymnCatalog.find((hymn) => normalizeHymnTitle(hymn.title) === normalizedTitle);
+}
+
+function findHymnByNumber(number) {
+  const normalizedNumber = number.trim();
+  if (!/^\d+$/.test(normalizedNumber)) {
+    return undefined;
+  }
+  return hymnCatalog.find((hymn) => String(hymn.number) === String(Number(normalizedNumber)));
+}
+
+function syncHymnFields(nameField, numberField, source) {
+  const hymn = source === "number"
+    ? findHymnByNumber(numberField.value)
+    : findHymnByTitle(nameField.value);
+
+  if (hymn) {
+    nameField.value = hymn.title;
+    numberField.value = String(hymn.number);
+  } else if (source === "number") {
+    nameField.value = "";
+  } else {
+    numberField.value = "";
+  }
+}
+
+function setupHymnFields() {
+  if (hymnCatalog.length) {
+    const options = hymnCatalog.map((hymn) => {
+      const option = document.createElement("option");
+      option.value = hymn.title;
+      option.label = `${hymn.title} — nº ${hymn.number}`;
+      return option;
+    });
+    hymnSuggestions.replaceChildren(...options);
+  } else {
+    console.error("O catálogo local de hinos não está disponível.");
+  }
+
+  for (const [nameId, numberId] of hymnFieldPairs) {
+    const nameField = document.querySelector(`#${nameId}`);
+    const numberField = document.querySelector(`#${numberId}`);
+    nameField.addEventListener("input", () => syncHymnFields(nameField, numberField, "name"));
+    numberField.addEventListener("input", () => syncHymnFields(nameField, numberField, "number"));
+  }
 }
 
 function showScreen(screen) {
@@ -529,7 +606,14 @@ const exampleValues = {
 };
 
 for (const [id, value] of Object.entries(exampleValues)) {
-  document.querySelector(`#${id}`).value = value;
+  const field = document.querySelector(`#${id}`);
+  if (field instanceof HTMLSelectElement && value) {
+    const exampleOption = document.createElement("option");
+    exampleOption.value = value;
+    exampleOption.textContent = value;
+    field.append(exampleOption);
+  }
+  field.value = value;
 }
 
 function updateAgendaStep(stepIndex, focusHeading = false) {
@@ -606,6 +690,16 @@ function restoreDraft() {
           || field instanceof HTMLSelectElement)
         && typeof value === "string"
       ) {
+        if (
+          field instanceof HTMLSelectElement
+          && value
+          && ![...field.options].some((option) => option.value === value)
+        ) {
+          const draftOption = document.createElement("option");
+          draftOption.value = value;
+          draftOption.textContent = value;
+          field.append(draftOption);
+        }
         field.value = value;
       }
     }
@@ -619,8 +713,156 @@ function restoreDraft() {
   }
 }
 
+function normalizeWardName(value) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function renderWardOptions(wards, selectedName = wardSelect.value) {
+  const prompt = document.createElement("option");
+  prompt.value = "";
+  prompt.textContent = "Selecione uma ala";
+  wardSelect.replaceChildren(prompt);
+
+  for (const ward of wards) {
+    const option = document.createElement("option");
+    option.value = ward.name;
+    option.textContent = ward.name;
+    wardSelect.append(option);
+  }
+
+  const existingOption = [...wardSelect.options].find((option) =>
+    normalizeWardName(option.value) === normalizeWardName(selectedName)
+  );
+  if (selectedName && !existingOption) {
+    const draftOption = document.createElement("option");
+    draftOption.value = selectedName;
+    draftOption.textContent = `${selectedName} (não sincronizada)`;
+    wardSelect.append(draftOption);
+  }
+
+  wardSelect.value = existingOption?.value || selectedName || "";
+}
+
+async function loadWardCatalog(selectedName = wardSelect.value) {
+  if (!window.bispadoSupabase) {
+    wardCatalogStatus.textContent = "Configure a URL e a chave pública do Supabase para carregar e cadastrar alas.";
+    renderWardOptions([], selectedName);
+    return false;
+  }
+
+  wardCatalogStatus.textContent = "Carregando alas cadastradas...";
+  const { data, error } = await window.bispadoSupabase
+    .from("wards")
+    .select("name")
+    .order("name", { ascending: true });
+
+  if (error) {
+    wardCatalogStatus.textContent = "Não foi possível carregar as alas. Verifique a migração do banco e a conexão.";
+    console.error("Falha ao carregar o catálogo de alas do Supabase.", error);
+    renderWardOptions([], selectedName);
+    return false;
+  }
+
+  renderWardOptions(data, selectedName);
+  wardCatalogStatus.textContent = `${data.length} ${data.length === 1 ? "ala cadastrada" : "alas cadastradas"}.`;
+  return true;
+}
+
+async function addWard() {
+  const name = newWardName.value.trim().replace(/\s+/g, " ");
+  if (name.length < 2 || name.length > 80) {
+    wardCatalogStatus.textContent = "Informe um nome de ala entre 2 e 80 caracteres.";
+    newWardName.focus();
+    return;
+  }
+
+  if (!window.bispadoSupabase) {
+    wardCatalogStatus.textContent = "Não foi possível cadastrar: configure a URL e a chave pública do Supabase.";
+    return;
+  }
+
+  const alreadyListed = [...wardSelect.options].find((option) =>
+    normalizeWardName(option.value) === normalizeWardName(name)
+  );
+  if (alreadyListed) {
+    wardSelect.value = alreadyListed.value;
+    wardCatalogStatus.textContent = "Essa ala já está na lista.";
+    return;
+  }
+
+  saveWardButton.disabled = true;
+  wardCatalogStatus.textContent = "Cadastrando ala...";
+  const { error } = await window.bispadoSupabase.from("wards").insert({ name });
+  if (error) {
+    if (error.code === "23505") {
+      await loadWardCatalog(name);
+      wardCatalogStatus.textContent = "Essa ala já foi cadastrada.";
+    } else {
+      wardCatalogStatus.textContent = `Não foi possível cadastrar a ala: ${error.message}`;
+      console.error("Falha ao cadastrar uma ala no Supabase.", error);
+    }
+    saveWardButton.disabled = false;
+    return;
+  }
+
+  const loaded = await loadWardCatalog(name);
+  if (loaded) {
+    wardCatalogStatus.textContent = `Ala “${name}” cadastrada e selecionada.`;
+    wardAddControls.hidden = true;
+    addWardToggle.setAttribute("aria-expanded", "false");
+    newWardName.value = "";
+    wardSelect.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  saveWardButton.disabled = false;
+}
+
+setupHymnFields();
 updateAgendaStep(0);
 restoreDraft();
+for (const [nameId, numberId] of hymnFieldPairs) {
+  const nameField = document.querySelector(`#${nameId}`);
+  const numberField = document.querySelector(`#${numberId}`);
+  const titleMatch = findHymnByTitle(nameField.value);
+  const numberMatch = findHymnByNumber(numberField.value);
+  if (titleMatch) {
+    syncHymnFields(nameField, numberField, "name");
+  } else if (!nameField.value && numberMatch) {
+    syncHymnFields(nameField, numberField, "number");
+  }
+}
+void loadWardCatalog(wardSelect.value);
+
+addWardToggle.addEventListener("click", () => {
+  wardAddControls.hidden = !wardAddControls.hidden;
+  addWardToggle.setAttribute("aria-expanded", String(!wardAddControls.hidden));
+  if (!wardAddControls.hidden) {
+    newWardName.focus();
+  }
+});
+
+cancelWardButton.addEventListener("click", () => {
+  wardAddControls.hidden = true;
+  addWardToggle.setAttribute("aria-expanded", "false");
+  newWardName.value = "";
+  wardCatalogStatus.textContent = "";
+  addWardToggle.focus();
+});
+
+saveWardButton.addEventListener("click", () => {
+  void addWard();
+});
+
+newWardName.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    void addWard();
+  }
+});
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();

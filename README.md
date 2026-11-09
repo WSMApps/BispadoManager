@@ -10,8 +10,9 @@ reservada para indicadores futuros. A tela da agenda permite conferir ou
 imprimir a programação e acessar **Criar agenda**, que contém o formulário.
 Dados fictícios são carregados para demonstração; edite os campos por etapa,
 volte para corrigir o que precisar e selecione **Revisar agenda** para conferir
-a prévia antes de imprimir. O campo
-**Ala** é manual por enquanto e aparece nas boas-vindas junto à data.
+a prévia antes de imprimir. O campo **Ala** oferece as alas cadastradas no
+Supabase e permite cadastrar novas pelo próprio formulário; o nome selecionado
+aparece nas boas-vindas junto à data.
 Na prévia, cada folha aparece separada e a quebra de página indica onde começa
 a segunda página. Em telas pequenas, cartões e campos se reorganizam para
 leitura e preenchimento no celular, mantendo a mesma disposição de
@@ -26,6 +27,9 @@ No cartão **Designações**, presidente e dirigente aparecem lado a lado na
 primeira linha; regente, organista e recepcionista ficam juntos na linha
 seguinte. O formulário também inclui reconhecimento, anúncios, hinos, orações,
 apoios e desobrigações e os demais itens da reunião.
+Os campos de hino sugerem títulos do catálogo local enquanto você digita;
+escolher um título preenche o número, e informar um número reconhecido preenche
+o título correspondente.
 Na tela de cadastro, a seção **Abertura e cronograma** reúne reconhecimentos,
 anúncios, hinos, orações, apoios e desobrigações. Os quatro hinos ficam agrupados
 em um cartão, as duas orações em outro, e os campos dos três oradores ficam
@@ -83,19 +87,24 @@ ficar no Supabase, protegidas por Row Level Security (RLS).
 ## Assistente virtual (SecretárioAI)
 
 O SecretárioAI é um chat local em português, com respostas preparadas sobre o
-preenchimento, a visualização e a impressão da agenda. A opção **Montar agenda
-comigo** conduz uma entrevista: confirma antes de limpar os exemplos, pergunta
-os dados da reunião, permite pular campos opcionais e cadastrar apoios,
-desobrigações e ordenanças. Ao final, preenche o formulário no navegador e abre a prévia para revisão.
-Também responde a interações básicas, dúvidas sobre o site e pedidos de ajuda,
-e permite abrir o cadastro ou a agenda pelo chat. O botão com ícone de folha e
-**+** no cabeçalho inicia a entrevista para uma nova agenda. Durante a
-entrevista, mostra respostas rápidas como **Sim**, **Não**, **Pular** e
-**Encerrar lista**. O chat usa respostas preparadas e busca local por assunto no
-índice do Manual Geral; não carrega modelos generativos nem envia perguntas a
+preenchimento, a visualização e a impressão da agenda. O formulário é preenchido
+diretamente na tela **Criar agenda**, fora do chat. O assistente também responde
+a interações básicas, dúvidas sobre o site e pedidos de ajuda, e permite abrir
+o cadastro ou a agenda. O chat usa respostas preparadas e busca local por assunto
+no índice do Manual Geral; não carrega modelos generativos nem envia perguntas a
 serviços externos. A busca por palavras-chave retorna títulos, números de item
-e páginas para facilitar a consulta da edição oficial. O avatar está em
+e páginas para facilitar a consulta da edição oficial. Quando a busca encontra
+títulos aproximados, o chat também oferece botões com os itens e páginas
+sugeridos; selecionar uma opção consulta o item pelo número. O avatar está em
 `assets/images/secretario-ai-avatar.png`.
+As respostas sociais são agrupadas por intenção, aceitam abreviações usuais e
+pequenas variações de digitação, e alternam entre opções sem variar
+aleatoriamente. Se uma expressão ficar ambígua, o chat pede esclarecimento.
+Pedidos que acompanham um agradecimento ou cumprimento continuam sendo
+processados. Mensagens que terminam na resposta de fallback ficam apenas na
+memória da página atual, limitadas às 20 mais recentes; podem ser consultadas
+com **ver falhas** e apagadas com **limpar falhas**. Elas não são salvas após
+recarregar a página nem enviadas a serviços externos.
 Também há respostas resumidas para as reuniões da ala, da estaca, conselhos,
 serviços fúnebres e orientações relacionadas do capítulo 29, além de assuntos
 dos capítulos 30 (chamados) e 18 (ordenanças e bênçãos) do Manual Geral.
@@ -116,8 +125,8 @@ Para orientações completas, consulte as edições oficiais vigentes.
 
 ## Desenvolvimento local
 
-1. Configure a URL do projeto e a chave pública `anon`/publishable em
-   `supabase-config.js`.
+1. A URL do projeto já está em `supabase-config.js`; configure nele a chave
+   pública `anon`/publishable do projeto para habilitar a lista de alas.
 2. O assistente funciona localmente, sem chave de API ou dependência de serviço
    generativo externo.
 3. Na raiz do projeto, inicie um servidor estático:
@@ -135,10 +144,13 @@ senhas ou a string de conexão do PostgreSQL no frontend ou no repositório.
 ## Supabase
 
 Crie um projeto Supabase e execute os arquivos SQL adicionados em
-`supabase/migrations/` pelo SQL Editor, em ordem. As tabelas e políticas de
-acesso específicas do BispadoManager devem ser definidas antes de armazenar
-dados. Ative RLS em todas as tabelas acessíveis pelo navegador e conceda
-somente as permissões necessárias.
+`supabase/migrations/` pelo SQL Editor, em ordem. A migração
+`001_wards.sql` cria o catálogo de alas e inclui os oito nomes iniciais
+informados. A política atual permite que visitantes anônimos leiam e cadastrem
+alas; não permite editar ou apagar registros. Como o cadastro é público, novas
+entradas ficam visíveis a todos e podem exigir moderação se houver abuso.
+Ative RLS em todas as tabelas acessíveis pelo navegador e conceda somente as
+permissões necessárias.
 
 ## Publicação no GitHub Pages
 

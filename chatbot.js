@@ -5,73 +5,80 @@ const assistantMessages = document.querySelector("#assistant-messages");
 const assistantForm = document.querySelector("#assistant-form");
 const assistantInput = document.querySelector("#assistant-input");
 const assistantSuggestions = document.querySelector("#assistant-suggestions");
-const assistantStartGuided = document.querySelector("#assistant-start-guided");
-const assistantQuickReplies = document.querySelector("#assistant-quick-replies");
 const officialManualUrl = "https://www.churchofjesuschrist.org/study/manual/general-handbook?lang=por";
 
-const guidedSteps = [
-  { type: "field", id: "ward", prompt: "Qual é o nome da ala?" },
-  { type: "field", id: "meeting-date", prompt: "Qual é a data da reunião? Informe no formato DD/MM/AAAA.", date: true },
-  { type: "field", id: "president", prompt: "Quem presidirá a reunião?" },
-  { type: "field", id: "conducting", prompt: "Quem dirigirá a reunião?" },
-  { type: "field", id: "regent", prompt: "Quem será o regente?" },
-  { type: "field", id: "organist", prompt: "Quem será o organista?" },
-  { type: "field", id: "receptionist", prompt: "Quem será o recepcionista?" },
-  { type: "field", id: "leaders-present", prompt: "Há visitantes ou líderes para reconhecer? Informe os nomes ou digite “pular”.", optional: true },
-  { type: "field", id: "announcements", prompt: "Quais são os anúncios? Você pode informar mais de um, separados por ponto e vírgula, ou digitar “pular”.", optional: true },
-  { type: "field", id: "opening-hymn-name", prompt: "Qual é o nome do primeiro hino?" },
-  { type: "field", id: "opening-hymn-number", prompt: "Qual é o número do primeiro hino?" },
-  { type: "field", id: "opening-prayer", prompt: "Quem fará a primeira oração?" },
-  { type: "field", id: "sacramental-hymn", prompt: "Qual é o nome do hino sacramental?" },
-  { type: "field", id: "sacramental-hymn-number", prompt: "Qual é o número do hino sacramental?" },
-  { type: "field", id: "speaker-1-name", prompt: "Quem será o primeiro orador?" },
-  { type: "field", id: "speaker-1-topic", prompt: "Qual será o tema do primeiro orador?" },
-  { type: "field", id: "speaker-2-name", prompt: "Quem será o segundo orador?" },
-  { type: "field", id: "speaker-2-topic", prompt: "Qual será o tema do segundo orador?" },
-  { type: "field", id: "special-hymn", prompt: "Qual é o nome do hino especial?" },
-  { type: "field", id: "special-hymn-number", prompt: "Qual é o número do hino especial?" },
-  { type: "field", id: "speaker-3-name", prompt: "Quem será o último orador?" },
-  { type: "field", id: "speaker-3-topic", prompt: "Qual será o tema do último orador?" },
-  { type: "field", id: "closing-hymn", prompt: "Qual é o nome do último hino?" },
-  { type: "field", id: "closing-hymn-number", prompt: "Qual é o número do último hino?" },
-  { type: "field", id: "closing-prayer", prompt: "Quem fará a última oração?" },
+const fallbackExamples = [];
+const lastFriendlyReplyIndexes = new Map();
+const fallbackReply = "Ainda não tenho uma resposta preparada para isso. Você pode reformular ou explicar um pouco o que quis dizer? Também posso ajudar com a agenda, hinos ou busca no índice do Manual Geral.";
+
+const friendlyIntents = [
   {
-    type: "list",
-    prefix: "support",
-    title: "apoio",
-    plural: "apoios",
-    fields: [
-      { key: "name", label: "nome" },
-      { key: "calling", label: "chamado" }
-    ],
-    max: 10
+    name: "greeting",
+    phrases: ["oi", "ola", "oi tudo bem", "ola tudo bem", "e ai", "eae", "eai", "oie", "opa", "salve", "fala", "fala ai", "bom dia", "boa tarde", "boa noite", "saudacoes"],
+    replies: [
+      "Olá! Como posso ajudar? Posso orientar sobre a agenda, hinos ou buscar um assunto no índice do Manual Geral.",
+      "Opa! O que você precisa? Posso ajudar com a agenda, hinos ou a busca no índice do Manual Geral."
+    ]
   },
   {
-    type: "list",
-    prefix: "release",
-    title: "desobrigação",
-    plural: "desobrigações",
-    fields: [
-      { key: "name", label: "nome" },
-      { key: "calling", label: "chamado" }
-    ],
-    max: 10
+    name: "check-in",
+    phrases: ["tudo bem", "como vai", "como voce esta", "como voce vai", "como voce esta hoje", "como voce tem passado", "tudo certo por ai", "suave", "suave por ai", "tranquilo", "tranquila", "beleza"],
+    replies: ["Tudo bem, obrigado! Como posso ajudar?", "Tudo certo. O que você precisa?"]
   },
   {
-    type: "list",
-    prefix: "ordinance",
-    title: "ordenança",
-    plural: "ordenanças",
-    fields: [
-      { key: "type", label: "tipo de ordenança" },
-      { key: "officiant", label: "quem realiza" },
-      { key: "notes", label: "observações" }
-    ],
-    max: 3
+    name: "thanks",
+    phrases: ["obrigado", "obrigada", "muito obrigado", "muito obrigada", "obrigado pela ajuda", "obrigada pela ajuda", "obrigado por ajudar", "obrigada por ajudar", "obrigado tambem", "obrigada tambem", "valeu", "valeu pela ajuda", "valeu pela forca", "valeu mesmo", "valeu cara", "valeu mano", "valeu tambem", "brigadao", "agradeco", "agradeco muito", "agradeco pela ajuda", "agradecido", "agradecida", "sou grato", "sou grata", "grato", "grata", "gratidao", "salvou", "quebrou um galho"],
+    replies: ["Por nada!", "Imagina!", "Que bom que foi útil."]
+  },
+  {
+    name: "together",
+    phrases: ["e nois", "tamo junto"],
+    replies: ["É isso! Estou por aqui se precisar.", "Tamo junto! Se precisar, é só chamar."]
+  },
+  {
+    name: "farewell",
+    phrases: ["tchau", "tchau ate mais", "ate", "ate mais", "ate logo", "ate a proxima", "ate amanha", "falou", "falou entao", "fui", "a gente se fala", "tenha um bom dia", "tenha uma boa tarde", "tenha uma boa noite", "bom descanso"],
+    replies: ["Até mais!", "Combinado, até!", "Até a próxima!"]
+  },
+  {
+    name: "apology",
+    phrases: ["desculpa", "desculpe", "foi mal", "mals ai", "perdao"],
+    replies: ["Sem problema.", "Tranquilo!"]
+  },
+  {
+    name: "help",
+    phrases: ["ajuda", "help", "o que voce sabe", "o que posso perguntar", "como pode me ajudar", "voce pode me ajudar", "o que posso fazer", "que pode fazer por mim", "quais suas funcoes", "quais sao suas funcoes", "o que voce faz"],
+    replies: [
+      "Posso orientar você no preenchimento, edição e impressão da agenda, ajudar com hinos ou procurar palavras-chave no índice do Manual Geral. O que você gostaria de saber?",
+      "Posso ajudar com a agenda sacramental, hinos e busca de assuntos no índice do Manual Geral. Por onde quer começar?"
+    ]
+  },
+  {
+    name: "confirmation",
+    phrases: ["sim", "isso", "exatamente", "correto", "certo", "entendi", "compreendi", "ok", "okay", "ok beleza", "beleza entao", "pode ser", "fechado", "fechou", "demorou", "combinado", "continua", "continuar", "prossegue", "prossiga", "segue"],
+    replies: ["Combinado. Vamos em frente.", "Certo. Como posso ajudar agora?"]
+  },
+  {
+    name: "negative",
+    phrases: ["nao", "negativo", "agora nao", "nao obrigado", "nao obrigada", "deixa pra la", "deixa para la"],
+    replies: ["Tudo bem, sem problema.", "Certo. Se precisar depois, estarei por aqui."]
+  },
+  {
+    name: "positive-reaction",
+    phrases: ["legal", "bacana", "show", "massa", "da hora", "top", "otimo", "otima", "maravilha", "que bom", "muito bom", "excelente", "gostei", "bom trabalho", "otimo trabalho", "obrigado gostei", "adorei"],
+    replies: ["Boa! Que bom que foi útil.", "Legal. Posso ajudar com mais alguma coisa?"]
+  },
+  {
+    name: "laughter",
+    phrases: ["risos", "haha", "hahaha", "kkk", "kkkk", "rs", "rsrs"],
+    replies: ["😊 O que mais posso fazer por você?", "😊 Se precisar de algo, é só falar."]
+  },
+  {
+    name: "confusion",
+    phrases: ["nao entendi", "nao compreendi", "nao saquei"],
+    replies: ["Sem problema. Quer que eu explique de outro jeito?", "Entendi. Diga qual parte ficou confusa e tento esclarecer."]
   }
 ];
-
-let guidedInterview = null;
 
 const responseTopics = [
   {
@@ -91,7 +98,7 @@ const responseTopics = [
       "comecar agenda",
       "por onde comeco"
     ],
-    answer: "Você pode preencher manualmente: abra “Agenda Sacramental” e escolha “Criar agenda”. Ou use o botão com o ícone de folha e “+” no cabeçalho do chat para responder às perguntas e gerar a prévia."
+    answer: "Abra “Agenda Sacramental” e escolha “Criar agenda” para preencher o formulário. Depois, use “Revisar agenda” para conferir a prévia."
   },
   {
     phrases: [
@@ -135,7 +142,7 @@ const responseTopics = [
       "permanecem",
       "atualizar a pagina"
     ],
-    answer: "O rascunho da agenda é salvo automaticamente apenas neste navegador e pode ser apagado com “Limpar campos”. O modelo generativo, quando ativado, processa as perguntas neste dispositivo. Para baixá-lo pela primeira vez é necessária conexão à internet."
+    answer: "O rascunho da agenda é salvo automaticamente apenas neste navegador e pode ser apagado com “Limpar campos”. As perguntas feitas ao chat são processadas localmente e não são enviadas a serviços externos."
   },
   {
     phrases: [
@@ -209,11 +216,11 @@ const responseTopics = [
   },
   {
     phrases: ["qual seu time", "para que time voce torce", "time do coracao", "torce pelo sao paulo", "voce torce para quem"],
-    answer: "Como personagem, torço pelo São Paulo! Essa preferência não interfere nas minhas respostas sobre a Igreja ou sobre a agenda."
+    answer: "Não tenho time nem preferências pessoais; sou um assistente virtual. Posso ajudar com a agenda, hinos ou busca de assuntos no índice."
   },
   {
     phrases: ["quantos anos voce tem", "qual sua idade", "sua idade"],
-    answer: "Como personagem fictício, tenho 32 anos. Sou uma persona sintética de inteligência artificial, não uma pessoa real."
+    answer: "Não tenho idade; sou um assistente virtual, não uma pessoa. Posso ajudar com a agenda, hinos ou busca de assuntos no índice."
   },
   {
     phrases: [
@@ -235,6 +242,146 @@ function normalizeQuestion(value) {
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function canonicalizeConversationalVariants(normalized) {
+  const aliases = new Map([
+    ["vc", "voce"],
+    ["vcs", "voces"],
+    ["vlw", "valeu"],
+    ["flw", "falou"],
+    ["obg", "obrigado"],
+    ["obgd", "obrigado"],
+    ["brigado", "obrigado"],
+    ["blz", "beleza"],
+    ["tbm", "tambem"],
+    ["tb", "tambem"],
+    ["td", "tudo"]
+  ]);
+  return normalized.split(" ").map((word) => aliases.get(word) || word).join(" ");
+}
+
+function editDistanceAtMostOne(first, second) {
+  if (Math.abs(first.length - second.length) > 1) {
+    return false;
+  }
+
+  let firstIndex = 0;
+  let secondIndex = 0;
+  let differences = 0;
+
+  while (firstIndex < first.length && secondIndex < second.length) {
+    if (first[firstIndex] === second[secondIndex]) {
+      firstIndex += 1;
+      secondIndex += 1;
+      continue;
+    }
+
+    differences += 1;
+    if (differences > 1) {
+      return false;
+    }
+
+    if (first.length > second.length) {
+      firstIndex += 1;
+    } else if (second.length > first.length) {
+      secondIndex += 1;
+    } else {
+      firstIndex += 1;
+      secondIndex += 1;
+    }
+  }
+
+  return differences + Number(firstIndex < first.length || secondIndex < second.length) <= 1;
+}
+
+function matchFriendlyIntent(normalizedQuestion) {
+  const normalized = canonicalizeConversationalVariants(normalizedQuestion);
+  const questionWords = normalized.split(" ");
+  const matches = [];
+
+  for (const intent of friendlyIntents) {
+    for (const phrase of intent.phrases) {
+      const phraseWords = phrase.split(" ");
+      if (questionWords.length !== phraseWords.length) {
+        continue;
+      }
+
+      let differences = 0;
+      let exactWords = 0;
+      let withinThreshold = true;
+      for (let index = 0; index < phraseWords.length; index += 1) {
+        if (questionWords[index] === phraseWords[index]) {
+          exactWords += 1;
+        } else if (
+          questionWords[index].length >= 4
+          && phraseWords[index].length >= 4
+          && editDistanceAtMostOne(questionWords[index], phraseWords[index])
+        ) {
+          differences += 1;
+        } else {
+          withinThreshold = false;
+          break;
+        }
+      }
+
+      if (withinThreshold && differences <= 1) {
+        matches.push({ intent, differences, exactWords });
+      }
+    }
+  }
+
+  matches.sort((first, second) => first.differences - second.differences || second.exactWords - first.exactWords);
+  const best = matches[0];
+  if (!best) {
+    return null;
+  }
+
+  const competingIntents = matches.filter((match) =>
+    match.differences === best.differences
+    && match.exactWords === best.exactWords
+    && match.intent.name !== best.intent.name
+  );
+  return competingIntents.length === 0 ? best.intent : null;
+}
+
+function chooseFriendlyReply(intent) {
+  const previousIndex = lastFriendlyReplyIndexes.get(intent.name);
+  const nextIndex = previousIndex === undefined ? 0 : (previousIndex + 1) % intent.replies.length;
+  lastFriendlyReplyIndexes.set(intent.name, nextIndex);
+  return intent.replies[nextIndex];
+}
+
+function splitFriendlyPrefix(question) {
+  const normalized = canonicalizeConversationalVariants(normalizeQuestion(question));
+  const connectors = new Set(["agora", "entao", "mas", "e", "tambem", "me", "pode", "podemos", "queria", "quero", "preciso", "como", "voce", "por"]);
+  const candidates = [];
+
+  for (const intent of friendlyIntents) {
+    if (!["greeting", "thanks", "together", "positive-reaction", "apology"].includes(intent.name)) {
+      continue;
+    }
+
+    for (const phrase of intent.phrases) {
+      const prefix = canonicalizeConversationalVariants(phrase);
+      if (!normalized.startsWith(`${prefix} `)) {
+        continue;
+      }
+
+      const remainingQuestion = normalized.slice(prefix.length).trim();
+      if (connectors.has(remainingQuestion.split(" ")[0])) {
+        candidates.push({ intent, prefixLength: prefix.length, remainingQuestion });
+      }
+    }
+  }
+
+  candidates.sort((first, second) => second.prefixLength - first.prefixLength);
+  const best = candidates[0];
+  if (!best || (candidates[1] && candidates[1].prefixLength === best.prefixLength && candidates[1].intent.name !== best.intent.name)) {
+    return null;
+  }
+
+  return best;
 }
 
 function scorePhraseMatch(normalizedQuestion, phrase) {
@@ -279,32 +426,17 @@ function scorePhraseMatch(normalizedQuestion, phrase) {
   return matchedWords * 10 + (matchedWords / phraseWords.length) * 10 + phraseWords.length / 100;
 }
 
-function getLocalAnswer(question) {
-  const normalizedQuestion = normalizeQuestion(question);
-  const greeting = /^(oi|ola|bom dia|boa tarde|boa noite|tudo bem|ola tudo bem|e ai)$/.test(normalizedQuestion);
+function getFriendlyInteractionReply(normalizedQuestion) {
+  const intent = matchFriendlyIntent(normalizedQuestion);
+  return intent ? chooseFriendlyReply(intent) : null;
+}
 
-  if (greeting) {
-    return "Olá! Sou o SecretárioAI, assistente virtual do BispadoManager. Posso ajudar a organizar a agenda sacramental e localizar informações em fontes oficiais da Igreja.";
-  }
+function getLocalAnswer(question, originalQuestion = question) {
+  const normalizedQuestion = canonicalizeConversationalVariants(normalizeQuestion(question));
+  const friendlyReply = getFriendlyInteractionReply(normalizedQuestion);
 
-  if (/^(obrigado|obrigada|muito obrigado|muito obrigada|valeu|agradeco)$/.test(normalizedQuestion)) {
-    return "Por nada! Fico feliz em ajudar. Se quiser montar uma agenda, use o botão com o ícone de folha no cabeçalho do chat.";
-  }
-
-  if (/^(tchau|ate mais|ate logo|ate a proxima)$/.test(normalizedQuestion)) {
-    return "Até mais! Quando precisar, estarei aqui para ajudar.";
-  }
-
-  if (/^(tudo bem|como vai|como voce esta|como voce vai)$/.test(normalizedQuestion)) {
-    return "Tudo certo por aqui, obrigado por perguntar! Como posso ajudar?";
-  }
-
-  if (/^(ajuda|help|o que voce sabe|o que posso perguntar|como pode me ajudar)$/.test(normalizedQuestion)) {
-    return "Posso explicar como preencher, editar e imprimir a agenda, falar sobre hinos e designações ou conduzir o preenchimento. Para começar, use o botão com o ícone de folha no cabeçalho do chat.";
-  }
-
-  if (/^(sim|nao|ok|certo|entendi|pode ser|legal|bacana|show|beleza)$/.test(normalizedQuestion)) {
-    return "Certo! Se quiser montar uma agenda passo a passo, use o botão com o ícone de folha e “+” no cabeçalho do chat. Também posso responder dúvidas sobre o preenchimento e a impressão.";
+  if (friendlyReply) {
+    return friendlyReply;
   }
 
   const navigationResult = handleNavigationRequest(normalizedQuestion);
@@ -331,7 +463,15 @@ function getLocalAnswer(question) {
     return `Posso responder com resumos locais preparados e localizar outros assuntos no índice do Manual Geral enviado (versão 2/25), mas não tenho o texto completo nem um resumo de cada seção. Se você informar o assunto com mais palavras ou o número do item, posso procurar uma referência relacionada. Para instruções completas e atualizadas, consulte o Manual Geral oficial: ${officialManualUrl}`;
   }
 
-  return "Ainda não tenho uma resposta preparada para essa pergunta. Posso ajudar com outra coisa?";
+  if (/\b(resuma|resume|resumir|resumo)\b/.test(normalizedQuestion)) {
+    return "Tenho resumos locais preparados sobre alguns assuntos do Manual Geral e posso localizar referências pelo tema ou número do item. Não consigo criar automaticamente um resumo de texto livre; se você indicar o assunto, procuro o conteúdo disponível na base local.";
+  }
+
+  fallbackExamples.push({ message: originalQuestion, intent: "sem correspondência" });
+  if (fallbackExamples.length > 20) {
+    fallbackExamples.shift();
+  }
+  return fallbackReply;
 }
 
 function findKnowledgeBaseAnswer(normalizedQuestion, originalQuestion = "") {
@@ -459,13 +599,24 @@ function findManualIndexMatches(normalizedQuestion, manualIndex, limit = 5) {
   return manualIndex
     .map((entry) => {
       const titleTerms = normalizeQuestion(entry.title).split(" ");
-      const matches = queryTerms.map((term) => titleTerms.some((titleTerm) => (
-        titleTerm === term
-        || (term.length >= 4 && titleTerm.startsWith(term))
-        || (titleTerm.length >= 4 && term.startsWith(titleTerm))
-      )));
+      let exactMatches = 0;
+      const matches = queryTerms.map((term) => titleTerms.some((titleTerm) => {
+        const normalizedTerm = normalizeManualIndexTerm(term);
+        const normalizedTitleTerm = normalizeManualIndexTerm(titleTerm);
+        const exact = titleTerm === term
+          || (normalizedTerm.length >= 4 && normalizedTerm === normalizedTitleTerm);
+        if (exact) {
+          exactMatches += 1;
+          return true;
+        }
+
+        return (term.length >= 4 && titleTerm.startsWith(term))
+          || (titleTerm.length >= 4 && term.startsWith(titleTerm))
+          || (normalizedTerm.length >= 5
+            && normalizedTitleTerm.length >= 5
+            && editDistanceAtMostOne(normalizedTerm, normalizedTitleTerm));
+      }));
       const matchedTerms = matches.filter(Boolean).length;
-      const exactMatches = queryTerms.filter((term) => titleTerms.includes(term)).length;
 
       return {
         ...entry,
@@ -479,7 +630,7 @@ function findManualIndexMatches(normalizedQuestion, manualIndex, limit = 5) {
     .sort((a, b) => (
       b.score - a.score
       || b.coverage - a.coverage
-      || b.section.length - a.section.length
+      || a.section.length - b.section.length
     ))
     .slice(0, limit);
 }
@@ -543,6 +694,43 @@ function findHymnCatalogAnswer(normalizedQuestion) {
   return null;
 }
 
+function normalizeManualIndexTerm(term) {
+  const suffixes = ["acoes", "acao", "imentos", "imento", "amentos", "amento", "idades", "idade", "adores", "adoras", "ador", "adora", "icoes", "icao", "ados", "adas", "idos", "idas", "ando", "endo", "indo", "ado", "ada", "ido", "ida", "ar", "er", "ir"];
+  const suffix = suffixes.find((candidate) => term.length - candidate.length >= 4 && term.endsWith(candidate));
+  const stem = suffix ? term.slice(0, -suffix.length) : term;
+  return stem.endsWith("s") && stem.length > 4 ? stem.slice(0, -1) : stem;
+}
+
+function getManualIndexSuggestions(normalizedQuestion) {
+  const manualIndex = window.SECRETARIO_MANUAL_INDEX;
+  if (!Array.isArray(manualIndex)) {
+    return [];
+  }
+
+  const terms = normalizedQuestion.split(" ").filter((term) => term.length >= 4);
+  if (terms.length === 0 || findManualIndexMatch(normalizedQuestion, manualIndex, normalizedQuestion)) {
+    return [];
+  }
+
+  return findManualIndexMatches(normalizedQuestion, manualIndex, 4)
+    .filter((entry) => entry.score >= 2 && entry.coverage >= 0.5 && entry.matchedTerms >= Math.min(2, terms.length));
+}
+
+function displayManualIndexSuggestions(entries) {
+  assistantSuggestions.replaceChildren();
+  assistantSuggestions.setAttribute("aria-label", "Sugestões aproximadas de itens do Manual Geral");
+
+  for (const entry of entries) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = `${entry.section} — ${entry.title} (p. ${entry.page})`;
+    button.dataset.question = entry.section;
+    assistantSuggestions.append(button);
+  }
+
+  assistantSuggestions.hidden = entries.length === 0;
+}
+
 function findMatchingTopic(normalizedQuestion) {
   let bestTopic = null;
   let bestScore = 0;
@@ -573,7 +761,7 @@ function handleNavigationRequest(normalizedQuestion) {
   if (wantsForm) {
     document.querySelector('[data-screen="agenda"]').click();
     document.querySelector("#create-agenda-button").click();
-    return "Abri a tela “Criar agenda”. Você pode preencher os campos manualmente ou usar o botão com o ícone de folha e “+” no cabeçalho do chat para receber orientação.";
+    return "Abri a tela “Criar agenda”. Preencha os campos do formulário e selecione “Revisar agenda” para conferir a prévia.";
   }
 
   const wantsAgenda = [
@@ -586,55 +774,10 @@ function handleNavigationRequest(normalizedQuestion) {
 
   if (wantsAgenda) {
     document.querySelector('[data-screen="agenda"]').click();
-    return "Abri a tela da agenda. Se ainda não houver uma prévia, escolha “Criar agenda” ou peça para eu montar com você.";
+    return "Abri a tela da agenda. Se ainda não houver uma prévia, escolha “Criar agenda” para preencher o formulário.";
   }
 
   return null;
-}
-
-function isConversationControl(question) {
-  const normalized = normalizeQuestion(question);
-  return /^(repetir|repete|repita|nao entendi|pode repetir|repetir pergunta|ajuda|help|o que eu respondo|o que devo responder|como respondo|posso pular|obrigado|obrigada|muito obrigado|muito obrigada|valeu|agradeco|oi|ola|bom dia|boa tarde|boa noite|tudo bem|tchau|ate mais|cancelar)$/.test(normalized);
-}
-
-function handleGuidedConversation(question) {
-  const normalized = normalizeQuestion(question);
-
-  if (["repetir", "repete", "repita", "nao entendi", "pode repetir", "repetir pergunta"].includes(normalized)) {
-    askGuidedStep();
-    return true;
-  }
-
-  if (["ajuda", "help", "o que eu respondo", "o que devo responder", "como respondo", "posso pular"].includes(normalized)) {
-    if (guidedInterview.phase === "confirm-reset") {
-      appendMessage("Responda “sim” para começar uma nova agenda ou “não” para manter os dados atuais.", "assistant");
-    } else {
-      appendMessage("Responda à pergunta atual, digite “pular” para deixar o campo em branco ou “cancelar” para encerrar a entrevista.", "assistant");
-      askGuidedStep();
-    }
-    return true;
-  }
-
-  if (/^(obrigado|obrigada|muito obrigado|muito obrigada|valeu|agradeco)$/.test(normalized)) {
-    appendMessage("Por nada! Vamos continuar.", "assistant");
-    askGuidedStep();
-    return true;
-  }
-
-  if (/^(oi|ola|bom dia|boa tarde|boa noite|tudo bem)$/.test(normalized)) {
-    appendMessage("Olá! Estou aqui para ajudar. Vamos continuar o preenchimento.", "assistant");
-    askGuidedStep();
-    return true;
-  }
-
-  const matchingTopic = findMatchingTopic(normalized);
-  if (matchingTopic) {
-    appendMessage(matchingTopic.answer, "assistant");
-    askGuidedStep();
-    return true;
-  }
-
-  return false;
 }
 
 function appendMessage(message, role) {
@@ -660,317 +803,6 @@ function appendMessage(message, role) {
   assistantMessages.scrollTop = assistantMessages.scrollHeight;
 }
 
-function setQuickReplies(options = []) {
-  assistantQuickReplies.replaceChildren();
-
-  for (const option of options) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = option.label;
-    button.dataset.answer = option.answer;
-    assistantQuickReplies.append(button);
-  }
-
-  assistantQuickReplies.hidden = options.length === 0;
-}
-
-function writeFormValue(id, value) {
-  const field = document.getElementById(id);
-
-  if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
-    throw new Error(`Campo da agenda não encontrado: ${id}`);
-  }
-
-  field.value = value;
-  field.dispatchEvent(new Event("input", { bubbles: true }));
-}
-
-function isSkipAnswer(answer) {
-  return ["pular", "pule", "passar", "deixar em branco"].includes(normalizeQuestion(answer));
-}
-
-function parseYesNo(answer) {
-  const normalized = normalizeQuestion(answer);
-
-  if (["sim", "s", "quero", "pode", "vamos"].includes(normalized)) {
-    return true;
-  }
-
-  if (["nao", "n", "nao quero", "nenhum", "nenhuma", "nao ha", "pular"].includes(normalized)) {
-    return false;
-  }
-
-  return null;
-}
-
-function parseMeetingDate(answer) {
-  const value = answer.trim();
-  const isoDate = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  const localDate = /^(\d{1,2})[/. -](\d{1,2})[/. -](\d{4})$/.exec(value);
-  const parts = isoDate
-    ? { year: Number(isoDate[1]), month: Number(isoDate[2]), day: Number(isoDate[3]) }
-    : localDate
-      ? { year: Number(localDate[3]), month: Number(localDate[2]), day: Number(localDate[1]) }
-      : null;
-
-  if (!parts) {
-    return null;
-  }
-
-  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
-  if (
-    date.getUTCFullYear() !== parts.year
-    || date.getUTCMonth() !== parts.month - 1
-    || date.getUTCDate() !== parts.day
-  ) {
-    return null;
-  }
-
-  return `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
-}
-
-function askGuidedStep() {
-  if (!guidedInterview) {
-    return;
-  }
-
-  if (guidedInterview.phase === "confirm-reset") {
-    setQuickReplies([
-      { label: "Sim", answer: "sim" },
-      { label: "Não", answer: "não" }
-    ]);
-    appendMessage("Deseja começar uma nova agenda? Responda “sim” ou “não”.", "assistant");
-    return;
-  }
-
-  if (guidedInterview.activeList) {
-    const list = guidedInterview.activeList;
-
-    if (list.phase === "next") {
-      setQuickReplies([
-        { label: "Sim, adicionar", answer: "sim" },
-        { label: "Não, continuar", answer: "não" }
-      ]);
-      appendMessage(`Deseja adicionar mais ${list.step.plural}? Responda “sim” ou “não”.`, "assistant");
-      return;
-    }
-
-    const field = list.step.fields[list.fieldIndex];
-    const listOptions = [{ label: "Pular", answer: "pular" }];
-    if (list.fieldIndex === 0) {
-      listOptions.push({ label: "Encerrar lista", answer: "fim" });
-    }
-    setQuickReplies(listOptions);
-    const firstFieldHelp = list.fieldIndex === 0
-      ? " Digite “fim” para encerrar esta lista ou “pular” para deixar esta linha vazia."
-      : " Você pode digitar “pular” para deixar em branco.";
-    appendMessage(
-      `Informe ${field.label} para ${list.step.title} ${list.index}.${firstFieldHelp}`,
-      "assistant"
-    );
-    return;
-  }
-
-  const step = guidedSteps[guidedInterview.stepIndex];
-
-  if (!step) {
-    guidedInterview = null;
-    setQuickReplies();
-    appendMessage("Pronto! Preenchi a agenda. Vou abrir a prévia para você conferir; se precisar, escolha “Criar agenda” para fazer ajustes.", "assistant");
-    document.querySelector("#agenda-form").requestSubmit();
-    return;
-  }
-
-  if (step.type === "list") {
-    setQuickReplies([
-      { label: "Sim", answer: "sim" },
-      { label: "Não", answer: "não" }
-    ]);
-    appendMessage(`Deseja cadastrar ${step.plural}? Responda “sim” ou “não”.`, "assistant");
-    return;
-  }
-
-  setQuickReplies([{ label: "Pular", answer: "pular" }]);
-  const optionalHint = step.optional ? " Você pode digitar “pular” para deixar em branco." : " Se não souber, pode digitar “pular”.";
-  appendMessage(`${step.prompt}${optionalHint}`, "assistant");
-}
-
-function finishActiveList() {
-  guidedInterview.activeList = null;
-  guidedInterview.stepIndex += 1;
-  askGuidedStep();
-}
-
-function answerActiveList(answer) {
-  const list = guidedInterview.activeList;
-  const normalized = normalizeQuestion(answer);
-
-  if (list.phase === "next") {
-    const addAnother = parseYesNo(answer);
-
-    if (addAnother === null) {
-      appendMessage(`Responda “sim” para adicionar mais ${list.step.plural} ou “não” para continuar.`, "assistant");
-      return;
-    }
-
-    if (!addAnother) {
-      finishActiveList();
-      return;
-    }
-
-    if (list.index === list.step.max) {
-      appendMessage(`A lista permite até ${list.step.max} itens. Vou continuar para a próxima etapa.`, "assistant");
-      finishActiveList();
-      return;
-    }
-
-    list.index += 1;
-    list.fieldIndex = 0;
-    list.values = {};
-    list.phase = "field";
-    askGuidedStep();
-    return;
-  }
-
-  if (list.fieldIndex === 0 && normalized === "fim") {
-    finishActiveList();
-    return;
-  }
-
-  if (list.fieldIndex === 0 && isSkipAnswer(answer)) {
-    if (list.index === list.step.max) {
-      finishActiveList();
-      return;
-    }
-
-    list.index += 1;
-    askGuidedStep();
-    return;
-  }
-
-  const field = list.step.fields[list.fieldIndex];
-  list.values[field.key] = isSkipAnswer(answer) ? "" : answer.trim();
-  list.fieldIndex += 1;
-
-  if (list.fieldIndex < list.step.fields.length) {
-    askGuidedStep();
-    return;
-  }
-
-  for (const listField of list.step.fields) {
-    writeFormValue(`${list.step.prefix}-${listField.key}-${list.index}`, list.values[listField.key]);
-  }
-  list.phase = "next";
-  askGuidedStep();
-}
-
-function answerGuidedQuestion(answer) {
-  const normalized = normalizeQuestion(answer);
-
-  if (handleGuidedConversation(answer)) {
-    return;
-  }
-
-  if (normalized === "cancelar") {
-    guidedInterview = null;
-    setQuickReplies();
-    appendMessage("Entrevista cancelada. As respostas já informadas continuam no formulário desta página.", "assistant");
-    return;
-  }
-
-  if (guidedInterview.phase === "confirm-reset") {
-    const shouldStart = parseYesNo(answer);
-
-    if (shouldStart === null) {
-      appendMessage("Responda “sim” para começar uma nova agenda ou “não” para manter os dados atuais.", "assistant");
-      return;
-    }
-
-    if (!shouldStart) {
-      guidedInterview = null;
-      setQuickReplies();
-      appendMessage("Tudo bem. Mantive os dados atuais sem alterações.", "assistant");
-      return;
-    }
-
-    document.querySelector('[data-screen="agenda"]').click();
-    document.querySelector("#create-agenda-button").click();
-    document.querySelector("#agenda-form").reset();
-    guidedInterview = { stepIndex: 0 };
-    appendMessage("Vamos preencher a agenda. Você pode responder “pular” em qualquer pergunta ou “cancelar” para parar; nada será enviado para fora deste navegador.", "assistant");
-    askGuidedStep();
-    return;
-  }
-
-  if (guidedInterview.activeList) {
-    answerActiveList(answer);
-    return;
-  }
-
-  const step = guidedSteps[guidedInterview.stepIndex];
-  if (step.type === "list") {
-    const includeList = parseYesNo(answer);
-
-    if (includeList === null) {
-      appendMessage(`Responda “sim” ou “não” para cadastrar ${step.plural}.`, "assistant");
-      return;
-    }
-
-    if (!includeList) {
-      guidedInterview.stepIndex += 1;
-      askGuidedStep();
-      return;
-    }
-
-    guidedInterview.activeList = {
-      step,
-      index: 1,
-      fieldIndex: 0,
-      phase: "field",
-      values: {}
-    };
-    askGuidedStep();
-    return;
-  }
-
-  if (isSkipAnswer(answer)) {
-    writeFormValue(step.id, "");
-  } else if (step.date) {
-    const date = parseMeetingDate(answer);
-
-    if (!date) {
-      appendMessage("Não consegui reconhecer essa data. Informe no formato DD/MM/AAAA ou digite “pular”.", "assistant");
-      return;
-    }
-
-    writeFormValue(step.id, date);
-  } else {
-    writeFormValue(step.id, answer.trim());
-  }
-
-  guidedInterview.stepIndex += 1;
-  askGuidedStep();
-}
-
-function startGuidedInterview() {
-  guidedInterview = { phase: "confirm-reset" };
-  setQuickReplies([
-    { label: "Sim", answer: "sim" },
-    { label: "Não", answer: "não" }
-  ]);
-  appendMessage("Vou iniciar uma nova agenda e limpar os valores atuais do formulário, inclusive os exemplos. Deseja começar? Responda “sim” ou “não”.", "assistant");
-}
-
-function isGuidedStartIntent(question) {
-  const normalized = normalizeQuestion(question);
-  return normalized.includes("montar agenda")
-    || normalized.includes("montar a agenda")
-    || normalized.includes("preencher agenda")
-    || normalized.includes("preencher a agenda")
-    || normalized.includes("criar agenda comigo")
-    || normalized.includes("criar a agenda comigo");
-}
-
 function sendQuestion(question) {
   const trimmedQuestion = question.trim();
 
@@ -982,28 +814,32 @@ function sendQuestion(question) {
   assistantSuggestions.hidden = true;
   assistantInput.value = "";
 
-  if (guidedInterview) {
-    if (isGuidedStartIntent(trimmedQuestion)) {
-      appendMessage("A entrevista já está em andamento. Responda à pergunta atual ou digite “cancelar” para parar.", "assistant");
-    } else if (isConversationControl(trimmedQuestion) || findMatchingTopic(normalizeQuestion(trimmedQuestion))) {
-      if (!handleGuidedConversation(trimmedQuestion)) {
-        answerGuidedQuestion(trimmedQuestion);
-      }
-    } else {
-      answerGuidedQuestion(trimmedQuestion);
-    }
-  } else if (isGuidedStartIntent(trimmedQuestion)) {
-    startGuidedInterview();
-  } else {
-    const normalizedQuestion = normalizeQuestion(trimmedQuestion);
-    const navigationResult = handleNavigationRequest(normalizedQuestion);
-    const localAnswer = navigationResult || getLocalAnswer(trimmedQuestion);
-    appendMessage(localAnswer, "assistant");
+  const normalizedOriginal = canonicalizeConversationalVariants(normalizeQuestion(trimmedQuestion));
+  if (normalizedOriginal === "ver falhas" || normalizedOriginal === "ver mensagens sem resposta") {
+    const report = fallbackExamples.length
+      ? fallbackExamples.map((example, index) => `${index + 1}. ${example.message} (${example.intent})`).join("\n")
+      : "Ainda não há mensagens sem resposta nesta sessão.";
+    appendMessage(report, "assistant");
+    return;
   }
 
-  if (guidedInterview) {
-    assistantInput.focus();
+  if (normalizedOriginal === "limpar falhas" || normalizedOriginal === "limpar mensagens sem resposta") {
+    fallbackExamples.length = 0;
+    appendMessage("Pronto. As mensagens sem resposta desta sessão foram apagadas.", "assistant");
+    return;
   }
+
+  const friendlyPrefix = splitFriendlyPrefix(trimmedQuestion);
+  const questionToHandle = friendlyPrefix?.remainingQuestion || trimmedQuestion;
+  if (friendlyPrefix) {
+    appendMessage(chooseFriendlyReply(friendlyPrefix.intent), "assistant");
+  }
+
+  const normalizedQuestion = canonicalizeConversationalVariants(normalizeQuestion(questionToHandle));
+  const navigationResult = handleNavigationRequest(normalizedQuestion);
+  const localAnswer = navigationResult || getLocalAnswer(questionToHandle, trimmedQuestion);
+  appendMessage(localAnswer, "assistant");
+  displayManualIndexSuggestions(navigationResult ? [] : getManualIndexSuggestions(normalizedQuestion));
 }
 
 assistantToggle.addEventListener("click", () => {
@@ -1028,21 +864,8 @@ assistantForm.addEventListener("submit", (event) => {
 
 assistantSuggestions.addEventListener("click", (event) => {
   if (event.target instanceof HTMLButtonElement) {
-    sendQuestion(event.target.textContent);
+    sendQuestion(event.target.dataset.question || event.target.textContent);
   }
-});
-
-assistantQuickReplies.addEventListener("click", (event) => {
-  if (event.target instanceof HTMLButtonElement) {
-    sendQuestion(event.target.dataset.answer || event.target.textContent);
-  }
-});
-
-assistantStartGuided.addEventListener("click", () => {
-  appendMessage("Montar uma nova agenda", "user");
-  assistantSuggestions.hidden = true;
-  startGuidedInterview();
-  assistantInput.focus();
 });
 
 document.addEventListener("keydown", (event) => {

@@ -9,10 +9,10 @@
   <link rel="stylesheet" href="chat.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <script src="supabase-config.js" defer></script>
+  <script src="hymn-catalog.js" defer></script>
   <script src="app.js" defer></script>
   <script src="knowledge-base.js" defer></script>
   <script src="manual-index.js" defer></script>
-  <script src="hymn-catalog.js" defer></script>
   <script src="chatbot.js" defer></script>
 </head>
 <body>
@@ -80,7 +80,19 @@
           <div class="field-grid presidency-fields">
             <div class="field ward-field">
               <label for="ward">Ala</label>
-              <input id="ward" name="ward" type="text" placeholder="Nome da ala">
+              <select id="ward" name="ward">
+                <option value="">Selecione uma ala</option>
+              </select>
+              <button id="add-ward-toggle" class="button button-secondary ward-add-toggle" type="button" aria-expanded="false" aria-controls="ward-add-controls">Adicionar nova ala</button>
+              <div id="ward-add-controls" class="ward-add-controls" hidden>
+                <label for="new-ward-name">Nome da nova ala</label>
+                <input id="new-ward-name" type="text" maxlength="80" autocomplete="off" placeholder="Digite o nome da ala">
+                <div class="ward-add-actions">
+                  <button id="save-ward-button" class="button button-primary" type="button">Cadastrar ala</button>
+                  <button id="cancel-ward-button" class="button button-secondary" type="button">Cancelar</button>
+                </div>
+              </div>
+              <p id="ward-catalog-status" class="ward-catalog-status" role="status" aria-live="polite"></p>
             </div>
             <div class="field president-field">
               <label for="president">Presidente</label>
@@ -134,7 +146,7 @@
                 <div class="field-grid hymn-fields">
                   <div class="field">
                     <label for="opening-hymn-name">Primeiro hino</label>
-                    <input id="opening-hymn-name" name="opening-hymn-name" type="text" placeholder="Nome do hino">
+                    <input id="opening-hymn-name" name="opening-hymn-name" type="text" list="hymn-catalog-options" placeholder="Digite para buscar um hino">
                   </div>
                   <div class="field hymn-number-field">
                     <label for="opening-hymn-number">Número</label>
@@ -144,7 +156,7 @@
                 <div class="field-grid hymn-fields">
                   <div class="field">
                     <label for="sacramental-hymn">Hino sacramental</label>
-                    <input id="sacramental-hymn" name="sacramental-hymn" type="text" placeholder="Nome do hino">
+                    <input id="sacramental-hymn" name="sacramental-hymn" type="text" list="hymn-catalog-options" placeholder="Digite para buscar um hino">
                   </div>
                   <div class="field hymn-number-field">
                     <label for="sacramental-hymn-number">Número</label>
@@ -154,7 +166,7 @@
                 <div class="field-grid hymn-fields">
                   <div class="field">
                     <label for="special-hymn">Hino especial</label>
-                    <input id="special-hymn" name="special-hymn" type="text" placeholder="Nome do hino">
+                    <input id="special-hymn" name="special-hymn" type="text" list="hymn-catalog-options" placeholder="Digite para buscar um hino">
                   </div>
                   <div class="field hymn-number-field">
                     <label for="special-hymn-number">Número</label>
@@ -164,7 +176,7 @@
                 <div class="field-grid hymn-fields">
                   <div class="field">
                     <label for="closing-hymn">Último hino</label>
-                    <input id="closing-hymn" name="closing-hymn" type="text" placeholder="Nome do hino">
+                    <input id="closing-hymn" name="closing-hymn" type="text" list="hymn-catalog-options" placeholder="Digite para buscar um hino">
                   </div>
                   <div class="field hymn-number-field">
                     <label for="closing-hymn-number">Número</label>
@@ -172,6 +184,7 @@
                   </div>
                 </div>
               </div>
+              <datalist id="hymn-catalog-options"></datalist>
             </fieldset>
             <fieldset class="field-wide prayer-group">
               <legend>Orações</legend>
@@ -342,14 +355,6 @@
           <h2 id="assistant-title">SecretárioAI</h2>
           <p>Ajuda e busca local</p>
         </div>
-        <button id="assistant-start-guided" class="secretario-start-guided" type="button" aria-label="Montar uma nova agenda" title="Montar uma nova agenda">
-          <svg aria-hidden="true" viewBox="0 0 32 32" fill="none">
-            <path d="M7 3.5h11l5 5v18H7a2 2 0 0 1-2-2v-19a2 2 0 0 1 2-2Z" />
-            <path d="M18 3.5v5h5M9 13h8M9 17h6" />
-            <circle cx="22" cy="22" r="7" />
-            <path class="secretario-new-agenda-plus" d="M22 18.5v7M18.5 22h7" />
-          </svg>
-        </button>
         <button id="assistant-close" class="secretario-close" type="button" aria-label="Fechar conversa">×</button>
       </header>
       <div id="assistant-messages" class="secretario-messages" role="log" aria-live="polite" aria-relevant="additions">
@@ -360,7 +365,6 @@
         <button type="button">Como imprimo a agenda?</button>
         <button type="button">Os dados ficam salvos?</button>
       </div>
-      <div id="assistant-quick-replies" class="secretario-suggestions secretario-quick-replies" aria-label="Respostas rápidas" hidden></div>
       <form id="assistant-form" class="secretario-form">
         <label class="sr-only" for="assistant-input">Digite sua pergunta</label>
         <input id="assistant-input" name="question" type="text" maxlength="500" placeholder="Digite sua pergunta..." autocomplete="off">

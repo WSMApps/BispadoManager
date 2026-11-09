@@ -425,9 +425,23 @@ window.SECRETARIO_KNOWLEDGE_BASE = Object.freeze([
     answer: "O item 29.5.4 orienta que, se o funeral de um membro ocorrer numa capela da Igreja, o bispo o dirija; em outros locais, a família pode pedir que ele o faça, e um conselheiro pode substituí-lo se necessário. O serviço deve ser reverente, simples e espiritual, com música e discursos breves centrados no evangelho e na esperança em Cristo. Homenagens podem existir, mas não devem dominar; vídeos não são usados em funerais no salão sacramental. Em geral, o serviço não deve exceder uma hora e meia e não costuma ser realizado aos domingos. A família não é obrigada a falar."
   },
   {
-    phrases: ["sepultamento ou cremacao", "dedicacao de sepultura", "roupa do templo sepultamento"],
+    phrases: [
+      "dedicacao sepultura",
+      "dedicacao de sepultura",
+      "dedicar sepultura",
+      "dedicar sepulturas",
+      "quem dedica sepultura",
+      "quem pode dedicar sepultura",
+      "ordenanca dedicacao sepultura",
+      "dedicacao do tumulo"
+    ],
+    section: "18.16",
+    answer: "Sim. A orientação específica está no capítulo 18, sobre ordenanças e bênçãos: o item 18.16 trata de dedicar sepulturas; o 18.16.1 identifica quem pode fazer a dedicação e o 18.16.2 traz as instruções. O quadro de responsabilidades do item 18.3 também indica que a dedicação cabe ao líder do sacerdócio que preside o funeral. Já o item 29.5.5 trata do contexto de sepultamento ou cremação e remete ao 18.16 para a dedicação."
+  },
+  {
+    phrases: ["sepultamento ou cremacao", "roupa do templo sepultamento"],
     section: "29.5.5",
-    answer: "O item 29.5.5 reúne orientações sobre sepultamento ou cremação. Quando possível, membros falecidos que receberam a investidura são sepultados ou cremados com as roupas do templo; um membro do bispado pode acompanhar a família ao cemitério, e a dedicação da sepultura depende da escolha da família e das orientações aplicáveis. Como há procedimentos específicos sobre roupas, cremação e dedicação, o manual remete também aos itens 18.16 e 38.5.10/38.7.2."
+    answer: "O item 29.5.5 reúne orientações sobre sepultamento ou cremação, incluindo roupas do templo e o acompanhamento da família. Para as instruções específicas sobre dedicar uma sepultura, consulte o item 18.16 (quem pode fazê-lo: 18.16.1; instruções: 18.16.2). O manual também remete aos itens 38.5.10 e 38.7.2 para orientações relacionadas."
   },
   {
     phrases: ["funeral para nao membro", "funeral de pessoa nao membro da igreja"],
