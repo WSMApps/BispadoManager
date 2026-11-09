@@ -7,10 +7,15 @@ const assistantInput = document.querySelector("#assistant-input");
 const assistantSuggestions = document.querySelector("#assistant-suggestions");
 const assistantStartGuided = document.querySelector("#assistant-start-guided");
 const assistantQuickReplies = document.querySelector("#assistant-quick-replies");
+const assistantLocalAI = document.querySelector("#assistant-local-ai");
+const assistantAIStatus = document.querySelector("#assistant-ai-status");
 const officialManualUrl = "https://www.churchofjesuschrist.org/study/manual/general-handbook?lang=por";
-const groqChatCompletionsUrl = "https://api.groq.com/openai/v1/chat/completions";
+const localModelId = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
+const webLLMUrl = "https://esm.run/@mlc-ai/web-llm@0.2.87";
 const assistantSubmitButton = assistantForm.querySelector('button[type="submit"]');
 const generativeHistory = [];
+let localEngine = null;
+let localEnginePromise = null;
 
 const guidedSteps = [
   { type: "field", id: "ward", prompt: "Qual é o nome da ala?" },
@@ -105,7 +110,7 @@ const responseTopics = [
       "atualizar agenda",
       "depois de preencher"
     ],
-    answer: "Depois de preencher ou alterar os campos, selecione “Salvar e visualizar agenda”. A agenda preenchida é atualizada na tela para você conferir."
+    answer: "Preencha as etapas e selecione “Revisar agenda” para conferir a prévia. Para corrigir algum dado, escolha “Editar agenda” e volte à etapa correspondente."
   },
   {
     phrases: [
@@ -138,7 +143,7 @@ const responseTopics = [
       "permanecem",
       "atualizar a pagina"
     ],
-    answer: "Os dados não são enviados nem salvos em um servidor; ficam no navegador. Na entrevista guiada, só uso as respostas que você fornece para preencher a agenda. Nada é enviado a um serviço externo."
+    answer: "O rascunho da agenda é salvo automaticamente apenas neste navegador e pode ser apagado com “Limpar campos”. O modelo generativo, quando ativado, processa as perguntas neste dispositivo. Para baixá-lo pela primeira vez é necessária conexão à internet."
   },
   {
     phrases: [
@@ -160,7 +165,7 @@ const responseTopics = [
       "editar os campos",
       "alterar os campos"
     ],
-    answer: "Na tela da agenda preenchida, escolha “Criar agenda”, faça as alterações e selecione “Salvar e visualizar agenda” para atualizar a prévia."
+    answer: "Na tela da agenda preenchida, escolha “Editar agenda”, ajuste os campos por etapa e selecione “Revisar agenda” para atualizar a prévia."
   },
   {
     phrases: [
@@ -545,11 +550,49 @@ function isShortLocalInteraction(normalizedQuestion) {
   return /^(oi|ola|bom dia|boa tarde|boa noite|tudo bem|ola tudo bem|e ai|obrigado|obrigada|muito obrigado|muito obrigada|valeu|agradeco|tchau|ate mais|ate logo|ate a proxima|sim|nao|ok|certo|entendi|pode ser|ajuda|help)$/.test(normalizedQuestion);
 }
 
+async function loadLocalAI() {
+  if (localEngine) {
+    return localEngine;
+  }
+  if (localEnginePromise) {
+    return localEnginePromise;
+  }
+  if (!navigator.gpu) {
+    const message = "Este navegador não oferece WebGPU. As respostas locais continuam disponíveis.";
+    assistantAIStatus.textContent = message;
+    throw new Error(message);
+  }
+
+  assistantLocalAI.disabled = true;
+  assistantLocalAI.textContent = "Preparando IA…";
+  assistantAIStatus.textContent = "Baixando e preparando o modelo no dispositivo. Isso pode levar alguns minutos.";
+  localEnginePromise = (async () => {
+    try {
+      const { CreateMLCEngine } = await import(webLLMUrl);
+      localEngine = await CreateMLCEngine(localModelId, {
+        initProgressCallback: ({ text }) => {
+          assistantAIStatus.textContent = text || "Preparando o modelo local…";
+        }
+      });
+      assistantLocalAI.textContent = "IA gratuita ativada";
+      assistantAIStatus.textContent = "Pronto. As perguntas são processadas neste dispositivo.";
+      return localEngine;
+    } catch (error) {
+      localEnginePromise = null;
+      assistantLocalAI.disabled = false;
+      assistantLocalAI.textContent = "Tentar ativar IA novamente";
+      assistantAIStatus.textContent = "Não foi possível carregar o modelo. Verifique a conexão, a compatibilidade WebGPU e a memória disponível.";
+      console.error("Falha ao carregar o modelo local.", error);
+      throw new Error("Não foi possível carregar o modelo de IA neste dispositivo.");
+    }
+  })();
+
+  return localEnginePromise;
+}
+
 async function requestGenerativeAnswer(question, normalizedQuestion, localAnswer) {
-  const configuration = window.SECRETARIO_AI_CONFIG;
-  const apiKey = configuration?.groqApiKey?.trim();
-  if (!apiKey) {
-    throw new Error("A chave da API Groq não foi configurada em secretario-ai-config.js.");
+  if (!localEngine) {
+    throw new Error("Ative a IA gratuita neste dispositivo antes de fazer uma pergunta generativa.");
   }
 
   const context = getRelevantKnowledgeContext(normalizedQuestion, question, localAnswer);
@@ -566,49 +609,25 @@ async function requestGenerativeAnswer(question, normalizedQuestion, localAnswer
     ...generativeHistory.slice(-8),
     { role: "user", content: question }
   ];
-
-  const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 30000);
-
-  try {
-    const response = await fetch(groqChatCompletionsUrl, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: configuration.model || "llama-3.3-70b-versatile",
-        messages,
-        temperature: 0.25,
-        max_completion_tokens: 500
-      }),
-      signal: controller.signal
-    });
-    const responseData = await response.json();
-
-    if (!response.ok) {
-      const providerMessage = responseData.error?.message || `HTTP ${response.status}`;
-      throw new Error(`Groq recusou a solicitação: ${providerMessage}`);
-    }
-
-    const answer = responseData.choices?.[0]?.message?.content?.trim();
-    if (!answer) {
-      throw new Error("Groq retornou uma resposta vazia.");
-    }
-
-    generativeHistory.push(
-      { role: "user", content: question },
-      { role: "assistant", content: answer }
-    );
-    if (generativeHistory.length > 8) {
-      generativeHistory.splice(0, generativeHistory.length - 8);
-    }
-
-    return answer;
-  } finally {
-    window.clearTimeout(timeoutId);
+  const response = await localEngine.chat.completions.create({
+    messages,
+    temperature: 0.25,
+    max_tokens: 400
+  });
+  const answer = response.choices?.[0]?.message?.content?.trim();
+  if (!answer) {
+    throw new Error("O modelo local retornou uma resposta vazia.");
   }
+
+  generativeHistory.push(
+    { role: "user", content: question },
+    { role: "assistant", content: answer }
+  );
+  if (generativeHistory.length > 8) {
+    generativeHistory.splice(0, generativeHistory.length - 8);
+  }
+
+  return answer;
 }
 
 function handleNavigationRequest(normalizedQuestion) {
@@ -1049,9 +1068,7 @@ async function sendQuestion(question) {
     const normalizedQuestion = normalizeQuestion(trimmedQuestion);
     const navigationResult = handleNavigationRequest(normalizedQuestion);
     const localAnswer = navigationResult || getLocalAnswer(trimmedQuestion);
-    const configuration = window.SECRETARIO_AI_CONFIG;
-
-    if (!configuration?.groqApiKey?.trim() || navigationResult || isShortLocalInteraction(normalizedQuestion)) {
+    if (!localEngine || navigationResult || isShortLocalInteraction(normalizedQuestion)) {
       appendMessage(localAnswer, "assistant");
     } else {
       assistantInput.disabled = true;
@@ -1064,12 +1081,12 @@ async function sendQuestion(question) {
         assistantMessages.lastElementChild.remove();
         appendMessage(answer, "assistant");
       } catch (error) {
-        console.error("Não foi possível consultar a API Groq.", error);
+        console.error("Não foi possível gerar uma resposta com o modelo local.", error);
         const errorMessage = error instanceof DOMException && error.name === "AbortError"
-          ? "A consulta à IA excedeu o limite de 30 segundos."
+          ? "A resposta da IA local excedeu o limite de tempo."
           : error instanceof Error
             ? error.message
-            : "Erro desconhecido ao consultar Groq.";
+            : "Erro desconhecido ao gerar uma resposta com IA local.";
         assistantMessages.lastElementChild.remove();
         appendMessage(`${errorMessage} ${localAnswer}`, "assistant");
       } finally {
@@ -1123,6 +1140,20 @@ assistantStartGuided.addEventListener("click", () => {
   assistantSuggestions.hidden = true;
   startGuidedInterview();
   assistantInput.focus();
+});
+
+assistantLocalAI.addEventListener("click", async () => {
+  try {
+    await loadLocalAI();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Não foi possível ativar a IA local.";
+    assistantAIStatus.textContent = message;
+    if (!navigator.gpu) {
+      assistantLocalAI.disabled = true;
+      assistantLocalAI.textContent = "IA indisponível neste navegador";
+    }
+    appendMessage(message, "assistant");
+  }
 });
 
 document.addEventListener("keydown", (event) => {

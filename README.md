@@ -8,8 +8,9 @@ para publicação no GitHub Pages e integração futura com Supabase.
 A página inicial contém um menu para acessar **Agenda Sacramental** e uma área
 reservada para indicadores futuros. A tela da agenda permite conferir ou
 imprimir a programação e acessar **Criar agenda**, que contém o formulário.
-Dados fictícios são carregados para demonstração; edite os campos e selecione
-**Salvar e visualizar agenda** para atualizar a agenda preenchida. O campo
+Dados fictícios são carregados para demonstração; edite os campos por etapa,
+volte para corrigir o que precisar e selecione **Revisar agenda** para conferir
+a prévia antes de imprimir. O campo
 **Ala** é manual por enquanto e aparece nas boas-vindas junto à data.
 Na prévia, cada folha aparece separada e a quebra de página indica onde começa
 a segunda página. Em telas pequenas, cartões e campos se reorganizam para
@@ -63,10 +64,10 @@ A prévia e as duas folhas impressas exibem uma fotografia discreta do Templo
 de Salt Lake como marca d'água. A foto é de Farragutful, publicada no Wikimedia
 Commons sob a licença [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
-As alterações do formulário só aparecem na agenda preenchida depois de
-selecionar **Salvar e visualizar agenda**. Os dados permanecem apenas na página
-aberta: não são salvos nem enviados ao Supabase. Atualizar a página carrega
-novamente os dados fictícios; **Limpar campos** deixa o formulário vazio.
+As alterações do formulário são salvas automaticamente como rascunho no
+armazenamento local deste navegador e são recuperadas ao reabrir a página.
+**Limpar campos** apaga o rascunho e deixa o formulário vazio. Os dados do
+rascunho não são enviados ao Supabase.
 
 ## Tecnologias
 
@@ -90,13 +91,17 @@ Também responde a interações básicas, dúvidas sobre o site e pedidos de aju
 e permite abrir o cadastro ou a agenda pelo chat. O botão com ícone de folha e
 **+** no cabeçalho inicia a entrevista para uma nova agenda. Durante a
 entrevista, mostra respostas rápidas como **Sim**, **Não**, **Pular** e
-**Encerrar lista**. O chat pode usar o modelo `llama-3.3-70b-versatile` pela API
-da Groq, com trechos relevantes da base local como contexto; sem chave, continua
-usando respostas locais preparadas. A conversa generativa envia a pergunta, o
-histórico recente e os trechos selecionados à Groq, mas não lê nem envia os
-campos preenchidos da agenda automaticamente. Não envie dados pessoais ou
-confidenciais. A chave direta no navegador fica visível aos visitantes e pode
-ser usada por terceiros, gerando consumo na conta. O avatar está em
+**Encerrar lista**. O chat também pode ativar, sob demanda, um modelo
+`Llama-3.2-1B` quantizado com WebLLM e WebGPU, executado no próprio navegador.
+O primeiro uso baixa o modelo e os componentes necessários da internet; isso
+pode consumir centenas de megabytes ou mais, além de memória e recursos do
+dispositivo. Não há cobrança por pergunta nem chave de API, e as perguntas não
+saem do navegador para serem processadas. É necessário navegador e hardware com
+WebGPU; em dispositivos incompatíveis, as respostas locais preparadas continuam
+disponíveis. O modelo e a biblioteca são carregados de serviços externos
+([WebLLM](https://github.com/mlc-ai/web-llm) e
+[Hugging Face](https://huggingface.co/mlc-ai/Llama-3.2-1B-Instruct-q4f16_1-MLC)).
+O avatar está em
 `assets/images/secretario-ai-avatar.png`.
 Também há respostas resumidas para as reuniões da ala, da estaca, conselhos,
 serviços fúnebres e orientações relacionadas do capítulo 29, além de assuntos
@@ -120,21 +125,17 @@ Para orientações completas, consulte as edições oficiais vigentes.
 
 1. Configure a URL do projeto e a chave pública `anon`/publishable em
    `supabase-config.js`.
-2. Para ativar respostas generativas, configure `groqApiKey` em
-   `secretario-ai-config.js` com uma chave criada na conta Groq. A chave enviada
-   ao navegador é pública. Para ativar a IA em um site público, a chave precisa
-   ser incluída no conteúdo servido e visitantes podem copiá-la e consumir a
-   cota da conta. Não use uma chave com acesso a outros recursos; configure
-   limites de uso no provedor e monitore o consumo. Um backend intermediário é
-   a opção recomendada para proteger a chave, embora não faça parte desta
-   configuração direta.
+2. A IA generativa opcional roda localmente no navegador usando WebLLM/WebGPU.
+   O modelo só é carregado após a pessoa selecionar **Ativar IA gratuita neste
+   dispositivo**. É necessário internet para o primeiro download e um navegador
+   compatível com WebGPU; sem suporte, as respostas locais continuam disponíveis.
 3. Na raiz do projeto, inicie um servidor estático:
 
    ```powershell
    py -m http.server 8000
    ```
 
-3. Abra <http://localhost:8000>.
+4. Abra <http://localhost:8000>.
 
 Sem configuração do Supabase, a agenda continua disponível no navegador. A
 chave pública é destinada ao navegador; nunca coloque a chave `service_role`,

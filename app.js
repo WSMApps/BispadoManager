@@ -10,6 +10,15 @@ const previewContent = document.querySelector("#preview-content");
 const previewContinuation = document.querySelector("#preview-continuation");
 const agendaFirstPage = document.querySelector("#agenda-first-page");
 const demoNotice = document.querySelector("#demo-notice");
+const agendaSteps = [...form.querySelectorAll(".form-section")];
+const agendaProgress = document.querySelector("#agenda-progress-steps");
+const draftStatus = document.querySelector("#draft-status");
+const previousStepButton = document.querySelector("#previous-step-button");
+const nextStepButton = document.querySelector("#next-step-button");
+const reviewAgendaButton = document.querySelector("#review-agenda-button");
+const draftStorageKey = "bispado-manager-agenda-draft-v1";
+let activeAgendaStep = 0;
+let draftStorageAvailable = true;
 
 const supabaseUrl = typeof config.url === "string" ? config.url.trim() : "";
 const supabaseAnonKey = typeof config.anonKey === "string" ? config.anonKey.trim() : "";
@@ -523,22 +532,137 @@ for (const [id, value] of Object.entries(exampleValues)) {
   document.querySelector(`#${id}`).value = value;
 }
 
+function updateAgendaStep(stepIndex, focusHeading = false) {
+  activeAgendaStep = stepIndex;
+
+  agendaSteps.forEach((section, index) => {
+    section.hidden = index !== activeAgendaStep;
+    const progressItem = agendaProgress.children[index];
+    progressItem.classList.toggle("is-current", index === activeAgendaStep);
+    progressItem.classList.toggle("is-complete", index < activeAgendaStep);
+    if (index === activeAgendaStep) {
+      progressItem.setAttribute("aria-current", "step");
+    } else {
+      progressItem.removeAttribute("aria-current");
+    }
+  });
+
+  previousStepButton.disabled = activeAgendaStep === 0;
+  nextStepButton.hidden = activeAgendaStep === agendaSteps.length - 1;
+  reviewAgendaButton.hidden = activeAgendaStep !== agendaSteps.length - 1;
+  draftStatus.textContent = `Etapa ${activeAgendaStep + 1} de ${agendaSteps.length}`;
+
+  if (focusHeading) {
+    const heading = agendaSteps[activeAgendaStep].querySelector("h2");
+    heading.tabIndex = -1;
+    heading.focus();
+  }
+}
+
+for (const [index, section] of agendaSteps.entries()) {
+  const item = document.createElement("li");
+  item.textContent = section.querySelector("h2").textContent;
+  item.setAttribute("aria-label", `Etapa ${index + 1}: ${item.textContent}`);
+  agendaProgress.append(item);
+}
+
+function saveDraft() {
+  if (!draftStorageAvailable) {
+    return;
+  }
+
+  const values = {};
+  for (const field of form.querySelectorAll("input[name], textarea[name], select[name]")) {
+    values[field.name] = field.value;
+  }
+
+  try {
+    window.localStorage.setItem(draftStorageKey, JSON.stringify(values));
+    draftStatus.textContent = `Etapa ${activeAgendaStep + 1} de ${agendaSteps.length} · Rascunho salvo neste navegador`;
+  } catch (error) {
+    draftStorageAvailable = false;
+    draftStatus.textContent = "Não foi possível salvar o rascunho neste navegador.";
+    console.error("Falha ao salvar o rascunho da agenda.", error);
+  }
+}
+
+function restoreDraft() {
+  try {
+    const serializedDraft = window.localStorage.getItem(draftStorageKey);
+    if (!serializedDraft) {
+      return;
+    }
+
+    const values = JSON.parse(serializedDraft);
+    if (!values || typeof values !== "object" || Array.isArray(values)) {
+      throw new TypeError("O rascunho salvo não contém um objeto de campos válido.");
+    }
+
+    for (const [name, value] of Object.entries(values)) {
+      const field = form.elements.namedItem(name);
+      if (
+        (field instanceof HTMLInputElement
+          || field instanceof HTMLTextAreaElement
+          || field instanceof HTMLSelectElement)
+        && typeof value === "string"
+      ) {
+        field.value = value;
+      }
+    }
+
+    demoNotice.textContent = "Rascunho anterior recuperado deste navegador. Confira os dados antes de salvar.";
+    draftStatus.textContent = "Rascunho recuperado deste navegador";
+  } catch (error) {
+    draftStorageAvailable = false;
+    draftStatus.textContent = "Não foi possível recuperar o rascunho salvo.";
+    console.error("Falha ao recuperar o rascunho da agenda.", error);
+  }
+}
+
+updateAgendaStep(0);
+restoreDraft();
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   demoNotice.hidden = true;
   renderAgenda();
+  document.querySelector("#create-agenda-button").textContent = "Editar agenda";
   showScreen("agenda");
 });
 
 form.addEventListener("input", () => {
   demoNotice.hidden = true;
+  saveDraft();
 });
 
 form.addEventListener("reset", () => {
   demoNotice.hidden = true;
+  try {
+    window.localStorage.removeItem(draftStorageKey);
+    draftStatus.textContent = "Rascunho removido deste navegador";
+  } catch (error) {
+    draftStorageAvailable = false;
+    draftStatus.textContent = "Não foi possível remover o rascunho salvo.";
+    console.error("Falha ao remover o rascunho da agenda.", error);
+  }
+  updateAgendaStep(0);
+});
+
+previousStepButton.addEventListener("click", () => {
+  if (activeAgendaStep > 0) {
+    updateAgendaStep(activeAgendaStep - 1, true);
+  }
+});
+
+nextStepButton.addEventListener("click", () => {
+  if (activeAgendaStep < agendaSteps.length - 1) {
+    updateAgendaStep(activeAgendaStep + 1, true);
+  }
 });
 
 document.querySelector("#create-agenda-button").addEventListener("click", () => {
+  updateAgendaStep(0);
+  document.querySelector("#create-agenda-button").textContent = preview.hidden ? "Criar agenda" : "Editar agenda";
   showScreen("create");
 });
 

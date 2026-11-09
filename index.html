@@ -13,7 +13,6 @@
   <script src="knowledge-base.js" defer></script>
   <script src="manual-index.js" defer></script>
   <script src="hymn-catalog.js" defer></script>
-  <script src="secretario-ai-config.js" defer></script>
   <script src="chatbot.js" defer></script>
 </head>
 <body>
@@ -66,6 +65,10 @@
 
       <form id="agenda-form" class="agenda-form">
         <p id="demo-notice" class="demo-notice" role="status">Exemplo de demonstração carregado. Substitua os dados pelos detalhes da sua reunião.</p>
+        <div class="agenda-progress">
+          <ol id="agenda-progress-steps" class="agenda-progress-steps" aria-label="Etapas do preenchimento"></ol>
+          <p id="draft-status" class="draft-status" role="status" aria-live="polite"></p>
+        </div>
         <section class="form-section" aria-labelledby="details-title">
           <div class="section-heading">
             <span class="section-number">01</span>
@@ -265,7 +268,9 @@
         </section>
 
         <div class="form-actions">
-          <button class="button button-primary" type="submit">Salvar e visualizar agenda <span aria-hidden="true">→</span></button>
+          <button id="previous-step-button" class="button button-secondary" type="button">Etapa anterior</button>
+          <button id="next-step-button" class="button button-primary" type="button">Continuar <span aria-hidden="true">→</span></button>
+          <button id="review-agenda-button" class="button button-primary" type="submit" hidden>Revisar agenda <span aria-hidden="true">→</span></button>
           <button class="button button-secondary" type="reset">Limpar campos</button>
         </div>
       </form>
@@ -311,7 +316,7 @@
           <div id="preview-continuation"></div>
           <button id="print-agenda" class="button button-print" type="button">Imprimir agenda</button>
         </article>
-        <p class="privacy-note"><span aria-hidden="true">◇</span> As informações ficam nesta página e não são salvas.</p>
+        <p class="privacy-note"><span aria-hidden="true">◇</span> O rascunho fica salvo apenas neste navegador. Não é enviado a um servidor.</p>
       </aside>
     </section>
   </main>
@@ -335,7 +340,7 @@
         <img src="./assets/images/secretario-ai-avatar.png" alt="" width="44" height="44">
         <div>
           <h2 id="assistant-title">SecretárioAI</h2>
-          <p>Ajuda local e IA Groq opcional</p>
+          <p>Ajuda local e IA gratuita opcional</p>
         </div>
         <button id="assistant-start-guided" class="secretario-start-guided" type="button" aria-label="Montar uma nova agenda" title="Montar uma nova agenda">
           <svg aria-hidden="true" viewBox="0 0 32 32" fill="none">
@@ -356,12 +361,16 @@
         <button type="button">Os dados ficam salvos?</button>
       </div>
       <div id="assistant-quick-replies" class="secretario-suggestions secretario-quick-replies" aria-label="Respostas rápidas" hidden></div>
+      <div class="secretario-ai-controls">
+        <button id="assistant-local-ai" type="button">Ativar IA gratuita neste dispositivo</button>
+        <p id="assistant-ai-status" role="status" aria-live="polite">Opcional: baixa um modelo grande uma vez; as perguntas são processadas neste dispositivo.</p>
+      </div>
       <form id="assistant-form" class="secretario-form">
         <label class="sr-only" for="assistant-input">Digite sua pergunta</label>
         <input id="assistant-input" name="question" type="text" maxlength="500" placeholder="Digite sua pergunta..." autocomplete="off">
         <button type="submit" aria-label="Enviar pergunta">Enviar</button>
       </form>
-      <p class="secretario-disclaimer">Configure uma chave Groq em secretario-ai-config.js para ativar a IA. Pergunta e referências seguem à Groq; não envie dados sensíveis. A chave no navegador é pública.</p>
+      <p class="secretario-disclaimer">A IA no dispositivo exige navegador com WebGPU e espaço/memória disponíveis. O download usa internet; não há cobrança por pergunta. Sem ativá-la, o chat usa respostas locais.</p>
     </aside>
   </section>
 </body>

@@ -235,6 +235,62 @@ p {
   line-height: 1.5;
 }
 
+.agenda-progress {
+  margin-bottom: 1.5rem;
+}
+
+.agenda-progress-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.agenda-progress-steps li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.agenda-progress-steps li::before {
+  display: grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: 0 0 1.65rem;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--white);
+  content: counter(list-item, decimal-leading-zero);
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.agenda-progress-steps li.is-current {
+  color: var(--green-dark);
+  font-weight: 700;
+}
+
+.agenda-progress-steps li.is-current::before,
+.agenda-progress-steps li.is-complete::before {
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--white);
+}
+
+.draft-status {
+  min-height: 1rem;
+  margin: 0.7rem 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
 .form-section + .form-section {
   margin-top: 2rem;
   padding-top: 1.75rem;
@@ -433,6 +489,11 @@ p {
   margin-top: 1.75rem;
   padding-top: 1.4rem;
   border-top: 1px solid var(--line);
+}
+
+.form-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .button {
@@ -1109,6 +1170,17 @@ p {
   .agenda-form {
     border-radius: 0.75rem;
     padding: 1rem;
+  }
+
+  .agenda-progress-steps {
+    gap: 0.35rem;
+  }
+
+  .agenda-progress-steps li {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.65rem;
   }
 
   .home-dashboard {
