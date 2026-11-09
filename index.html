@@ -361,16 +361,13 @@
         <button type="button">Os dados ficam salvos?</button>
       </div>
       <div id="assistant-quick-replies" class="secretario-suggestions secretario-quick-replies" aria-label="Respostas rápidas" hidden></div>
-      <div class="secretario-ai-controls">
-        <button id="assistant-local-ai" type="button">Ativar IA gratuita neste dispositivo</button>
-        <p id="assistant-ai-status" role="status" aria-live="polite">Opcional: baixa um modelo grande uma vez; as perguntas são processadas neste dispositivo.</p>
-      </div>
+      <p id="assistant-ai-status" class="secretario-ai-status" role="status" aria-live="polite">Preparando IA gratuita neste dispositivo…</p>
       <form id="assistant-form" class="secretario-form">
         <label class="sr-only" for="assistant-input">Digite sua pergunta</label>
         <input id="assistant-input" name="question" type="text" maxlength="500" placeholder="Digite sua pergunta..." autocomplete="off">
         <button type="submit" aria-label="Enviar pergunta">Enviar</button>
       </form>
-      <p class="secretario-disclaimer">A IA no dispositivo exige navegador com WebGPU e espaço/memória disponíveis. O download usa internet; não há cobrança por pergunta. Sem ativá-la, o chat usa respostas locais.</p>
+      <p class="secretario-disclaimer">A IA é carregada automaticamente neste dispositivo. O primeiro download usa internet e pode consumir centenas de megabytes; não há cobrança por pergunta. Requer navegador com WebGPU. Se não houver suporte, o chat usa respostas locais.</p>
     </aside>
   </section>
 </body>

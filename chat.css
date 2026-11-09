@@ -234,37 +234,9 @@
   padding: 0.7rem 0.8rem 0.3rem;
 }
 
-.secretario-ai-controls {
-  display: grid;
-  gap: 0.35rem;
-  padding: 0.6rem 0.8rem 0;
-}
-
-.secretario-ai-controls button {
-  min-height: 2.4rem;
-  padding: 0.45rem 0.65rem;
-  border: 1px solid #d5e2d9;
-  border-radius: 0.6rem;
-  background: var(--green-soft);
-  color: var(--green-dark);
-  cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 650;
-}
-
-.secretario-ai-controls button:hover,
-.secretario-ai-controls button:focus-visible {
-  border-color: var(--green);
-  background: #e2eee5;
-}
-
-.secretario-ai-controls button:disabled {
-  cursor: wait;
-  opacity: 0.7;
-}
-
-.secretario-ai-controls p {
+.secretario-ai-status {
   margin: 0;
+  padding: 0.6rem 0.8rem 0;
   color: var(--muted);
   font-size: 0.65rem;
   line-height: 1.4;

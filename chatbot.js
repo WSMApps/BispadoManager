@@ -7,7 +7,6 @@ const assistantInput = document.querySelector("#assistant-input");
 const assistantSuggestions = document.querySelector("#assistant-suggestions");
 const assistantStartGuided = document.querySelector("#assistant-start-guided");
 const assistantQuickReplies = document.querySelector("#assistant-quick-replies");
-const assistantLocalAI = document.querySelector("#assistant-local-ai");
 const assistantAIStatus = document.querySelector("#assistant-ai-status");
 const officialManualUrl = "https://www.churchofjesuschrist.org/study/manual/general-handbook?lang=por";
 const localModelId = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
@@ -563,8 +562,6 @@ async function loadLocalAI() {
     throw new Error(message);
   }
 
-  assistantLocalAI.disabled = true;
-  assistantLocalAI.textContent = "Preparando IA…";
   assistantAIStatus.textContent = "Baixando e preparando o modelo no dispositivo. Isso pode levar alguns minutos.";
   localEnginePromise = (async () => {
     try {
@@ -574,14 +571,11 @@ async function loadLocalAI() {
           assistantAIStatus.textContent = text || "Preparando o modelo local…";
         }
       });
-      assistantLocalAI.textContent = "IA gratuita ativada";
-      assistantAIStatus.textContent = "Pronto. As perguntas são processadas neste dispositivo.";
+      assistantAIStatus.textContent = "IA pronta. As perguntas são processadas neste dispositivo.";
       return localEngine;
     } catch (error) {
       localEnginePromise = null;
-      assistantLocalAI.disabled = false;
-      assistantLocalAI.textContent = "Tentar ativar IA novamente";
-      assistantAIStatus.textContent = "Não foi possível carregar o modelo. Verifique a conexão, a compatibilidade WebGPU e a memória disponível.";
+      assistantAIStatus.textContent = "Não foi possível carregar a IA. Verifique a conexão, a compatibilidade WebGPU e a memória disponível. Recarregue a página para tentar novamente.";
       console.error("Falha ao carregar o modelo local.", error);
       throw new Error("Não foi possível carregar o modelo de IA neste dispositivo.");
     }
@@ -1142,24 +1136,16 @@ assistantStartGuided.addEventListener("click", () => {
   assistantInput.focus();
 });
 
-assistantLocalAI.addEventListener("click", async () => {
-  try {
-    await loadLocalAI();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Não foi possível ativar a IA local.";
-    assistantAIStatus.textContent = message;
-    if (!navigator.gpu) {
-      assistantLocalAI.disabled = true;
-      assistantLocalAI.textContent = "IA indisponível neste navegador";
-    }
-    appendMessage(message, "assistant");
-  }
-});
-
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !assistantPanel.hidden) {
     assistantPanel.hidden = true;
     assistantToggle.setAttribute("aria-expanded", "false");
     assistantToggle.focus();
   }
+});
+
+loadLocalAI().catch((error) => {
+  const message = error instanceof Error ? error.message : "Não foi possível carregar a IA neste dispositivo.";
+  assistantAIStatus.textContent = `${message} O chat continuará com respostas locais.`;
+  console.warn("A IA generativa não está disponível neste dispositivo.", error);
 });

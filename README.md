@@ -91,7 +91,7 @@ Também responde a interações básicas, dúvidas sobre o site e pedidos de aju
 e permite abrir o cadastro ou a agenda pelo chat. O botão com ícone de folha e
 **+** no cabeçalho inicia a entrevista para uma nova agenda. Durante a
 entrevista, mostra respostas rápidas como **Sim**, **Não**, **Pular** e
-**Encerrar lista**. O chat também pode ativar, sob demanda, um modelo
+**Encerrar lista**. O chat carrega automaticamente um modelo
 `Llama-3.2-1B` quantizado com WebLLM e WebGPU, executado no próprio navegador.
 O primeiro uso baixa o modelo e os componentes necessários da internet; isso
 pode consumir centenas de megabytes ou mais, além de memória e recursos do
@@ -125,10 +125,9 @@ Para orientações completas, consulte as edições oficiais vigentes.
 
 1. Configure a URL do projeto e a chave pública `anon`/publishable em
    `supabase-config.js`.
-2. A IA generativa opcional roda localmente no navegador usando WebLLM/WebGPU.
-   O modelo só é carregado após a pessoa selecionar **Ativar IA gratuita neste
-   dispositivo**. É necessário internet para o primeiro download e um navegador
-   compatível com WebGPU; sem suporte, as respostas locais continuam disponíveis.
+2. A IA generativa roda automaticamente no navegador usando WebLLM/WebGPU.
+   É necessário internet para o primeiro download e um navegador compatível com
+   WebGPU; sem suporte, as respostas locais continuam disponíveis.
 3. Na raiz do projeto, inicie um servidor estático:
 
    ```powershell
