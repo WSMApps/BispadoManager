@@ -310,7 +310,7 @@ function getLocalAnswer(question) {
     return "Posso explicar como preencher, editar e imprimir a agenda, falar sobre hinos e designações ou conduzir o preenchimento. Para começar, use o botão com o ícone de folha no cabeçalho do chat.";
   }
 
-  if (/^(sim|nao|ok|certo|entendi|pode ser)$/.test(normalizedQuestion)) {
+  if (/^(sim|nao|ok|certo|entendi|pode ser|legal|bacana|show|beleza)$/.test(normalizedQuestion)) {
     return "Certo! Se quiser montar uma agenda passo a passo, use o botão com o ícone de folha e “+” no cabeçalho do chat. Também posso responder dúvidas sobre o preenchimento e a impressão.";
   }
 
@@ -546,7 +546,7 @@ function getRelevantKnowledgeContext(normalizedQuestion, originalQuestion, local
 }
 
 function isShortLocalInteraction(normalizedQuestion) {
-  return /^(oi|ola|bom dia|boa tarde|boa noite|tudo bem|ola tudo bem|e ai|obrigado|obrigada|muito obrigado|muito obrigada|valeu|agradeco|tchau|ate mais|ate logo|ate a proxima|sim|nao|ok|certo|entendi|pode ser|ajuda|help)$/.test(normalizedQuestion);
+  return /^(oi|ola|bom dia|boa tarde|boa noite|tudo bem|ola tudo bem|e ai|obrigado|obrigada|muito obrigado|muito obrigada|valeu|agradeco|tchau|ate mais|ate logo|ate a proxima|sim|nao|ok|certo|entendi|pode ser|legal|bacana|show|beleza|ajuda|help)$/.test(normalizedQuestion);
 }
 
 async function loadLocalAI() {
